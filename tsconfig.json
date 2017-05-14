@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "rootDir": "./",
+        "outDir": "./build/",
+        "module": "commonjs",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "inlineSources": true,
+        "baseUrl": ".",
+        "paths": {
+            "*": ["*"]
+        },
+        "typeRoots": [
+        ]
+    },
+    "include": [
+        "bin/www.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
