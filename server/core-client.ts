@@ -3,7 +3,7 @@ import * as url from 'url'
 import * as read from 'read'
 import * as log from 'npmlog' 
 import * as Client from 'bitcore-wallet-client'
-import * as FileStorage from './filestorage'
+import FileStorage from './filestorage'
 import * as sjcl from 'sjcl'
 
 var WALLET_ENCRYPTION_OPTS = {
@@ -57,7 +57,7 @@ class Utils {
 
       client.on('walletCompleted', function(wallet) {
         Utils.doSave(client, filename, password, function() {
-          log.info('Your wallet has just been completed. Please backup your wallet file or use the export command.');
+          console.log('Your wallet has just been completed. Please backup your wallet file or use the export command.');
         });
       });
       client.openWallet(function(err, isComplete) {
