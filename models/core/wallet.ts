@@ -92,7 +92,7 @@ class CoreWallet {
     }    
 
 
-    getCopayer(copayerId): string {
+    getCopayer(copayerId) {
         return _.find(this.copayers, {
             id: copayerId
         })
