@@ -1,8 +1,8 @@
 import {NETWORKS, DERIVATION_STRATEGIES, SCRIPT_TYPES} from './constants'
 import * as Uuid from 'uuid'
 import * as _ from 'lodash'
+import CoreAddress from '../../models/core/Address'
 import * as preconditions from 'preconditions'
-
 const $ = preconditions.singleton()
 
 
@@ -110,13 +110,13 @@ class CoreWallet {
         return this.scanning
     }
 
-    createAddress(isChange): Address {
+    createAddress(isChange): CoreAddress {
         $.checkState(this.isComplete())
 
         var self = this
 
         var path = this.addressManager.getNewAddressPath(isChange)
-        var address = Address.derive(self.id, this.addressType, this.publicKeyRing, path, this.m, this.network, isChange)
+        var address = CoreAddress.derive(self.id, this.addressType, this.publicKeyRing, path, this.m, this.network, isChange)
         return address
     }   
 
