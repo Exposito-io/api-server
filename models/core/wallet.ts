@@ -1,5 +1,9 @@
 import {NETWORKS, DERIVATION_STRATEGIES, SCRIPT_TYPES} from './constants'
 import * as Uuid from 'uuid'
+import * as _ from 'lodash'
+import * as preconditions from 'preconditions'
+
+const $ = preconditions.singleton()
 
 
 class CoreWallet {
@@ -20,6 +24,9 @@ class CoreWallet {
     addressType: SCRIPT_TYPES = SCRIPT_TYPES.P2SH
     scanStatus: any
     addressManager: AddressManager
+    
+    // Is this property used?
+    scanning: boolean
 
     
     constructor(opts: CoreWalletOpts) {
@@ -40,6 +47,94 @@ class CoreWallet {
 
     }
 
+
+    /**
+     * Get the maximum allowed number of required copayers.
+     * This is a limit imposed by the maximum allowed size of the scriptSig.
+     * @param {number} totalCopayers - the total number of copayers
+     */
+    getMaxRequiredCopayers(totalCopayers: number): number {
+        return CoreWallet.COPAYER_PAIR_LIMITS[totalCopayers]
+    }
+
+    verifyCopayerLimits(m: number, n: number): boolean {
+        return (n >= 1 && n <= 15) && (m >= 1 && m <= n);
+    }
+
+    isShared(): boolean {
+        return this.n > 1
+    }
+
+
+    addCopayer(copayer): void {
+
+        this.copayers.push(copayer)
+        if (this.copayers.length < this.n) return
+
+        this.status = 'complete'
+        this._updatePublicKeyRing()
+    }
+
+
+    addCopayerRequestKey(copayerId, requestPubKey, signature, restrictions, name): void {
+        $.checkState(this.copayers.length == this.n)
+
+        var c = this.getCopayer(copayerId)
+
+        //new ones go first
+        c.requestPubKeys.unshift({
+            key: requestPubKey.toString(),
+            signature: signature,
+            selfSigned: true,
+            restrictions: restrictions || {},
+            name: name || null,
+        })
+    }    
+
+
+    getCopayer(copayerId): string {
+        return _.find(this.copayers, {
+            id: copayerId
+        })
+    }  
+
+    getNetworkName(): NETWORKS {
+        return this.network
+    }
+
+    isComplete(): boolean {
+        return this.status == 'complete'
+    }
+
+    isScanning(): boolean {
+        return this.scanning
+    }
+
+    createAddress(isChange): Address {
+        $.checkState(this.isComplete())
+
+        var self = this
+
+        var path = this.addressManager.getNewAddressPath(isChange)
+        var address = Address.derive(self.id, this.addressType, this.publicKeyRing, path, this.m, this.network, isChange)
+        return address
+    }   
+
+
+    toObject(): any {
+        let x = _.cloneDeep<any>(this)
+        x.isShared = this.isShared()
+        return x
+    }      
+
+
+    _updatePublicKeyRing(): void {
+        this.publicKeyRing = _.map(this.copayers, function(copayer) {
+            return _.pick(copayer, ['xPubKey', 'requestPubKey'])
+        })
+    }    
+
+
     static fromObj(obj: CoreWallet): CoreWallet {
         let x = new CoreWallet({
           id: obj.id,
@@ -48,18 +143,17 @@ class CoreWallet {
           n: obj.n,
           singleAddress: obj.singleAddress,
           pubKey: obj.pubKey,
-          network: obj.network,
-          derivationStrategy: obj.derivationStrategy,
-          addressType: obj.addressType
+          network: obj.network
         })
 
-        x.version = obj.version
-        x.createdOn = obj.createdOn
+        Object.assign(x, obj)
 
-        // TODO
+        x.addressManager = AddressManager.fromObj(obj.addressManager)
 
         return x
     }
+
+    static COPAYER_PAIR_LIMITS: Array<number> = []
 
 }
 
