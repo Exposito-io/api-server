@@ -1,7 +1,8 @@
 import {NETWORKS, DERIVATION_STRATEGIES, SCRIPT_TYPES} from './constants'
 import * as Uuid from 'uuid'
 import * as _ from 'lodash'
-import CoreAddress from '../../models/core/Address'
+import CoreAddress from '../../models/core/address'
+import CoreAddressManager from '../../models/core/address-manager'
 import * as preconditions from 'preconditions'
 const $ = preconditions.singleton()
 
@@ -23,7 +24,7 @@ class CoreWallet {
     derivationStrategy: DERIVATION_STRATEGIES = DERIVATION_STRATEGIES.BIP45
     addressType: SCRIPT_TYPES = SCRIPT_TYPES.P2SH
     scanStatus: any
-    addressManager: AddressManager
+    addressManager: CoreAddressManager
     
     // Is this property used?
     scanning: boolean
@@ -39,7 +40,7 @@ class CoreWallet {
       this.network = opts.network
       this.derivationStrategy = opts.derivationStrategy || DERIVATION_STRATEGIES.BIP45
       this.addressType = opts.addressType || SCRIPT_TYPES.P2SH    
-      this.addressManager = new AddressManager({
+      this.addressManager = new CoreAddressManager({
         derivationStrategy: this.derivationStrategy
       })
       this.scanStatus = null
@@ -148,7 +149,7 @@ class CoreWallet {
 
         Object.assign(x, obj)
 
-        x.addressManager = AddressManager.fromObj(obj.addressManager)
+        x.addressManager = CoreAddressManager.fromObj(obj.addressManager)
 
         return x
     }
