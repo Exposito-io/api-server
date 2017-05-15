@@ -6,7 +6,9 @@ import * as logger from 'morgan'
 import * as bodyParser from 'body-parser'
 import * as root from 'app-root-path'
 import * as cookieParser from 'cookie-parser'
-import * as routes from './server/routes'
+import * as homepage from './server/homepage'
+import * as v1 from './server/v1'
+
 import * as authentication from './server/authentication'
 import * as session from 'express-session'
 import * as connectRedis from 'connect-redis'
@@ -54,8 +56,9 @@ authentication.initialize(app)
 
 
 
+app.use('/', homepage.controller)
+app.use('/v1', v1)
 
-app.use('/', routes)
 
 
 app.get('/profile',
