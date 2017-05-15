@@ -1,14 +1,15 @@
 import * as express from 'express'
+import wallets from './wallets'
 import CoreWallet from '../../models/core/wallet'
 
 
 const router = express.Router()
 
 router.get('/', (req, res) => res.json({}))
+router.use('/wallets', wallets)
 
 
-
-
+/*
 let w = new CoreWallet({ 
     name: 'afwe', 
     m: 1, 
@@ -16,7 +17,7 @@ let w = new CoreWallet({
     singleAddress: true, 
     pubKey: '', 
     network: 'fwaefew' 
-})
+})*/
 
 
 

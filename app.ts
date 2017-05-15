@@ -56,7 +56,7 @@ authentication.initialize(app)
 
 
 
-app.use('/', homepage.controller)
+app.get('/', homepage.controller)
 app.use('/v1', v1)
 
 
