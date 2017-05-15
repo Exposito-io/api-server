@@ -55,6 +55,7 @@
     "passport-google-oauth2": "^0.1.6",
     "preconditions": "^2.2.0",
     "serialize-error": "2.0.0",
+    "sjcl": "^1.0.6",
     "uuid": "^3.0.1",
     "validate.js": "0.10.0",
     "winston": "2.2.0"
@@ -73,6 +74,7 @@
     "@types/mongodb": "^2.2.2",
     "@types/morgan": "1.7.32",
     "@types/passport": "^0.3.3",
+    "@types/sjcl": "^1.0.28",
     "@types/uuid": "^2.0.29",
     "@types/validator": "5.7.34",
     "@types/winston": "0.0.28",
