@@ -30,6 +30,11 @@ abstract class Wallet {
         // TODO mcormier
         return true
     }
+
+    toJSON(): any {
+        let walletJson = Object.assign({}, this)
+        return walletJson
+    }
     
     static fromJSON(json: any): Wallet {
         if (Wallet.isJsonWalletValid(json)) {

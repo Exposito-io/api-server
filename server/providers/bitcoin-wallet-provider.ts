@@ -27,11 +27,21 @@ class BitcoinWalletProvider {
 
     }
 
-    async createWallet(wallet: BitcoinWallet): Promise<void> {
+    async createWallet(wallet: BitcoinWallet): Promise<Wallet> {
         if (!wallet.isValid()) 
             throw('Invalid wallet')
 
-        
+        try {
+            let db = await dbFactory.getConnection(config.get('database'))
+            let result = await db.collection('wallets').insertOne(wallet)
+
+            if (result.acknowledged && result.insertedId)
+                return await this.findById(result.insertedId)
+                
+        } catch(e) {
+            // TODO mcormier: Handle error
+            throw(e)
+        }        
     }
 
 }
