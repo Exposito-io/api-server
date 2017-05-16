@@ -6,7 +6,7 @@ import { Wallet } from '../../models/wallet'
 import BitcoinWallet from '../../models/bitcoin-wallet'
 
 
-class BitcoinWalletProvider {
+class WalletProvider {
 
     /**
      * Returns a Wallet object from its id
@@ -26,6 +26,8 @@ class BitcoinWalletProvider {
             return Wallet.fromJSON(wallets[0])
 
     }
+
+
 
     async createWallet(wallet: BitcoinWallet): Promise<Wallet> {
         if (!wallet.isValid()) 
