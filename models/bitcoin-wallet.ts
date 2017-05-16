@@ -11,4 +11,12 @@ class BitcoinWallet extends Wallet {
         
         this.type = WalletType.BITCOIN
     }
+
+
+    static fromJSON(json): BitcoinWallet {
+        return new BitcoinWallet()
+    }
 }
+
+
+export default BitcoinWallet
