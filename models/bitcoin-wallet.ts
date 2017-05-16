@@ -13,6 +13,12 @@ class BitcoinWallet extends Wallet {
     }
 
 
+    isValid(): boolean {
+        // TODO mcormier:
+        return super.isValid()
+            && true
+    }
+
     static fromJSON(json): BitcoinWallet {
         return new BitcoinWallet()
     }

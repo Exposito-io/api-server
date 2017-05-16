@@ -15,17 +15,21 @@ const WALLET_TYPES_MAP = new Map<WalletType, Function>([
 
 abstract class Wallet {
 
-    public getId() { return this._id }
-    public getType() { return this.type }
-    public getName() { return this.name }
-    public getLabels() { return this.labels }
-    public getUserId() { return this._userId }
+    getId() { return this._id }
+    getType() { return this.type }
+    getName() { return this.name }
+    getLabels() { return this.labels }
+    getUserId() { return this._userId }
 
-    public setName(name: string): void { this.name = name }
-    public addLabel(label: string): void { this.labels.add(label) }
-    public removeLabel(label: string): void { this.labels.delete(label) }
+    setName(name: string) { this.name = name }
+    addLabel(label: string) { this.labels.add(label) }
+    removeLabel(label: string) { this.labels.delete(label) }
 
     
+    isValid(): boolean {
+        // TODO mcormier
+        return true
+    }
     
     static fromJSON(json: any): Wallet {
         if (Wallet.isJsonWalletValid(json)) {

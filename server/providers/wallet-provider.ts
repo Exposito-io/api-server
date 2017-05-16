@@ -3,9 +3,10 @@ import * as config from 'config'
 import * as dbFactory from 'mongo-factory'
 import User from '../../models/user'
 import { Wallet } from '../../models/wallet'
+import BitcoinWallet from '../../models/bitcoin-wallet'
 
 
-class WalletProvider {
+class BitcoinWalletProvider {
 
     /**
      * Returns a Wallet object from its id
@@ -24,6 +25,13 @@ class WalletProvider {
         else
             return Wallet.fromJSON(wallets[0])
 
+    }
+
+    async createWallet(wallet: BitcoinWallet): Promise<void> {
+        if (!wallet.isValid()) 
+            throw('Invalid wallet')
+
+        
     }
 
 }
