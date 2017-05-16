@@ -6,6 +6,7 @@ abstract class Wallet {
     public getType() { return this.type }
     public getName() { return this.name }
     public getLabels() { return this.labels }
+    public getUserId() { return this._userId }
 
     public setName(name: string): void { this.name = name }
     public addLabel(label: string): void { this.labels.add(label) }
@@ -13,6 +14,7 @@ abstract class Wallet {
 
 
     protected _id: ObjectID
+    protected _userId: ObjectID
     protected type: WalletType = WalletType.UNKNOWN    
     protected name: string
     protected labels: Set<string>
