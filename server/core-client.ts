@@ -41,31 +41,31 @@ class Utils {
     static doLoad(client, doNotComplete, walletData, password, filename, cb) {
       if (password) {
         try {
-          walletData = sjcl.decrypt(password, walletData);
+          walletData = sjcl.decrypt(password, walletData)
         } catch (e) {
           //die('Could not open wallet. Wrong password.');
         }
       }
 
       try {
-        client.import(walletData);
+        client.import(walletData)
       } catch (e) {
         //die('Corrupt wallet file.');
-      };
-      if (doNotComplete) return cb(client);
+      }
+      if (doNotComplete) return cb(client)
 
 
       client.on('walletCompleted', function(wallet) {
         Utils.doSave(client, filename, password, function() {
-          console.log('Your wallet has just been completed. Please backup your wallet file or use the export command.');
-        });
-      });
+          console.log('Your wallet has just been completed. Please backup your wallet file or use the export command.')
+        })
+      })
       client.openWallet(function(err, isComplete) {
-        if (err) throw err;
+        if (err) throw err
 
-        return cb(client);
-      });
-    };
+        return cb(client)
+      })
+    }
 
     static loadEncrypted(client, opts, walletData, filename, cb) {
       read({
@@ -80,50 +80,50 @@ class Utils {
     };
 
     static getClient(args, opts, cb) {
-      opts = opts || {};
+      opts = opts || {}
 
-      var filename = args.file || process.env['WALLET_FILE'] || process.env['HOME'] + '/.wallet.dat';
-      var host = args.host || process.env['BWS_HOST'] || 'https://bws.bitpay.com/';
+      var filename = args.file || process.env['WALLET_FILE'] || process.env['HOME'] + '/.wallet.dat'
+      var host = args.host || process.env['BWS_HOST'] || 'https://bws.bitpay.com/'
 
       var storage = new FileStorage({
         filename: filename,
-      });
+      })
 
       var client = new Client({
         baseUrl: url.resolve(host, '/bws/api'),
         verbose: args.verbose,
-      });
+      })
 
       storage.load(function(err, walletData) {
         if (err) {
           if (err.code == 'ENOENT') {
-            if (opts.mustExist) {
-              throw('File "' + filename + '" not found.');
-            }
-          } else {
-            throw(err);
-          }
+            if (opts.mustExist) 
+              throw('File "' + filename + '" not found.')
+            
+          } else 
+            throw(err)
+          
         }
 
         if (walletData && opts.mustBeNew) {
-          throw('File "' + filename + '" already exists.');
+          throw('File "' + filename + '" already exists.')
         }
-        if (!walletData) return cb(client);
+        if (!walletData) return cb(client)
 
-        var json;
+        var json
         try {
-          json = JSON.parse(walletData);
+          json = JSON.parse(walletData)
         } catch (e) {
-          throw('Invalid input file');
-        };
+          throw('Invalid input file')
+        }
 
         if (json.ct) {
-          Utils.loadEncrypted(client, opts, walletData, filename, cb);
+          Utils.loadEncrypted(client, opts, walletData, filename, cb)
         } else {
-          Utils.doLoad(client, opts.doNotComplete, walletData, null, filename, cb);
+          Utils.doLoad(client, opts.doNotComplete, walletData, null, filename, cb)
         }
-      });
-    };
+      })
+    }
 
     static doSave(client, filename, password, cb) {
       var opts = {};
