@@ -5,6 +5,7 @@ import * as log from 'npmlog'
 import * as Client from 'bitcore-wallet-client'
 import FileStorage from './filestorage'
 import * as sjcl from 'sjcl'
+import { BitcoinCoreWallet } from '../models/core/bitcoin-core-wallet'
 
 var WALLET_ENCRYPTION_OPTS = {
   iter: 5000

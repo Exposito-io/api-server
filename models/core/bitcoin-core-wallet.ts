@@ -170,4 +170,5 @@ class CoreWalletOpts {
     addressType?: SCRIPT_TYPES     
 }
 
-export default BitcoinCoreWallet
+
+export { BitcoinCoreWallet }

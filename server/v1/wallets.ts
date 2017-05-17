@@ -1,5 +1,5 @@
 import * as express from 'express'
-import BitcoinCoreWallet from '../../models/core/wallet'
+import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
 import * as config from 'config'
