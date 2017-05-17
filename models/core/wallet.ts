@@ -7,7 +7,7 @@ import * as preconditions from 'preconditions'
 const $ = preconditions.singleton()
 
 
-class CoreWallet {
+class BitcoinCoreWallet {
     version: string = '1.0.0'
     createdOn: number = Math.floor(Date.now() / 1000)
     id: string
@@ -55,7 +55,7 @@ class CoreWallet {
      * @param {number} totalCopayers - the total number of copayers
      */
     getMaxRequiredCopayers(totalCopayers: number): number {
-        return CoreWallet.COPAYER_PAIR_LIMITS[totalCopayers]
+        return BitcoinCoreWallet.COPAYER_PAIR_LIMITS[totalCopayers]
     }
 
     verifyCopayerLimits(m: number, n: number): boolean {
@@ -136,8 +136,8 @@ class CoreWallet {
     }    
 
 
-    static fromObj(obj: CoreWallet): CoreWallet {
-        let x = new CoreWallet({
+    static fromObj(obj: BitcoinCoreWallet): BitcoinCoreWallet {
+        let x = new BitcoinCoreWallet({
           id: obj.id,
           name: obj.name,
           m: obj.m,
@@ -170,4 +170,4 @@ class CoreWalletOpts {
     addressType?: SCRIPT_TYPES     
 }
 
-export default CoreWallet
+export default BitcoinCoreWallet

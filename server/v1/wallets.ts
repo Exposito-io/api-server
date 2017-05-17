@@ -1,6 +1,6 @@
 import * as express from 'express'
-import CoreWallet from '../../models/core/wallet'
-import CoreClient from '../core-client' 
+import BitcoinCoreWallet from '../../models/core/wallet'
+import CoreClient from '../core-client'
 import * as _ from 'lodash'
 import * as config from 'config'
 

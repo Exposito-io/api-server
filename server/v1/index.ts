@@ -1,6 +1,6 @@
 import * as express from 'express'
 import wallets from './wallets'
-import CoreWallet from '../../models/core/wallet'
+import BitcoinCoreWallet from '../../models/core/wallet'
 
 
 const router = express.Router()

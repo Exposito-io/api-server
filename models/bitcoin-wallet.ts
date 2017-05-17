@@ -1,14 +1,14 @@
 import { Wallet, WalletType } from './wallet'
-import CoreWallet from './core/wallet'
+import BitcoinCoreWallet from './core/wallet'
 
 
 class BitcoinWallet extends Wallet {
 
-    protected coreWallet: CoreWallet
+    protected coreWallet: BitcoinCoreWallet
 
     constructor() {
         super()
-        
+
         this.type = WalletType.BITCOIN
     }
 
