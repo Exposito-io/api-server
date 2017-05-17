@@ -28,6 +28,12 @@ class BitcoinWallet extends Wallet {
         return wallet
     }
 
+    toFrontendJSON(): any {
+        let wallet = Object.assign(this, super.toFrontendJSON())
+        wallet.coreWallet = undefined
+        return wallet
+    }
+
 
     static fromJSON(json: any): BitcoinWallet {
         if (!BitcoinWallet.isJsonWalletValid(json))

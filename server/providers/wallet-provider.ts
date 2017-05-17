@@ -13,7 +13,7 @@ class WalletProvider {
      *
      * @param id Wallet id
      */
-    async findById(id: string|ObjectID): Promise<Wallet> {
+    async fetchById(id: string|ObjectID): Promise<Wallet> {
         if (!(id instanceof ObjectID))
             id = new ObjectID(id);
 
@@ -52,7 +52,7 @@ class WalletProvider {
             let result = await db.collection('wallets').insertOne(wallet.toJSON())
 
             if (result.insertedId)
-                return await this.findById(result.insertedId)
+                return await this.fetchById(result.insertedId)
                 
         } catch(e) {
             // TODO mcormier: Handle error

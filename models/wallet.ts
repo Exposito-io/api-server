@@ -38,6 +38,10 @@ abstract class Wallet {
         walletJson.labels = Array.from(this.getLabels())
         return walletJson
     }
+
+    toFrontendJSON(): any {
+        return this.toJSON()
+    }
     
     static fromJSON(json: any): Wallet {
         if (Wallet.isJsonWalletValid(json)) {

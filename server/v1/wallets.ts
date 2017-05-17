@@ -25,6 +25,17 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.get('/:id', async (req, res) => {
+    try {
+        let wallet = await walletProvider.fetchById(req.params.id)
+
+        res.json(wallet.toFrontendJSON())
+
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
 router.post('/', (req, res) => {
     try {
         if (!validateWalletName(req.body.name))
