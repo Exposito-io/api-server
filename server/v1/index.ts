@@ -9,16 +9,6 @@ router.get('/', (req, res) => res.json({}))
 router.use('/wallets', wallets)
 
 
-/*
-let w = new CoreWallet({ 
-    name: 'afwe', 
-    m: 1, 
-    n: 2, 
-    singleAddress: true, 
-    pubKey: '', 
-    network: 'fwaefew' 
-})*/
-
 
 
 export = router
