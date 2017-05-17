@@ -1,5 +1,5 @@
 import { ObjectID } from 'mongodb'
-import BitcoinWallet from './bitcoin-wallet'
+
 
 enum WalletType {
     UNKNOWN = 0,
@@ -7,9 +7,6 @@ enum WalletType {
     ETHEREUM = 2
 }
 
-const WALLET_TYPES_MAP = new Map<WalletType, Function>([
-    [WalletType.BITCOIN, BitcoinWallet.fromJSON]
-])
 
 
 
@@ -71,7 +68,11 @@ abstract class Wallet {
 
 
 
+import { BitcoinWallet } from './bitcoin-wallet'
 
+const WALLET_TYPES_MAP = new Map<WalletType, Function>([
+    [WalletType.BITCOIN, BitcoinWallet.fromJSON]
+])
 
 
 export { Wallet, WalletType }

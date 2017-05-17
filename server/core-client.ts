@@ -5,14 +5,19 @@ import * as log from 'npmlog'
 import * as Client from 'bitcore-wallet-client'
 import FileStorage from './filestorage'
 import * as sjcl from 'sjcl'
-import { BitcoinCoreWallet } from '../models/core/bitcoin-core-wallet'
+import { WalletProvider } from './providers/wallet-provider'
+import { BitcoinCoreWallet } from "../models/core/bitcoin-core-wallet";
+import { BitcoinWallet } from '../models/bitcoin-wallet'
 
 var WALLET_ENCRYPTION_OPTS = {
   iter: 5000
 }
 
-class Utils {
 
+let walletProvider = new WalletProvider()
+
+
+class Utils {
 
     static parseMN(text) {
       if (!text) throw new Error('No m-n parameter')
@@ -134,15 +139,22 @@ class Utils {
         //str = sjcl.encrypt(password, str, WALLET_ENCRYPTION_OPTS);
         // TODO
       }
-
+      /*
       var storage = new FileStorage({
         filename: filename,
-      });
-
+      });*/
+      /*
       storage.save(str, function(err) {
         //throw(err);
         return cb(err)
-      });
+      });*/
+      let jsonCoreWallet = JSON.parse(str)
+      let wallet = BitcoinCoreWallet.fromObj(jsonCoreWallet)
+      walletProvider.createWallet(new BitcoinWallet(wallet))
+      .then(newWallet => {
+        cb(null, newWallet)
+      })
+
     };
 
     static saveEncrypted(client, filename, cb) {

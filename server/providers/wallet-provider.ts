@@ -3,7 +3,7 @@ import * as config from 'config'
 import * as dbFactory from 'mongo-factory'
 import User from '../../models/user'
 import { Wallet } from '../../models/wallet'
-import BitcoinWallet from '../../models/bitcoin-wallet'
+import { BitcoinWallet } from '../../models/bitcoin-wallet'
 
 
 class WalletProvider {
@@ -37,7 +37,7 @@ class WalletProvider {
             let db = await dbFactory.getConnection(config.get('database'))
             let result = await db.collection('wallets').insertOne(wallet)
 
-            if (result.acknowledged && result.insertedId)
+            if (result.insertedId)
                 return await this.findById(result.insertedId)
                 
         } catch(e) {
@@ -47,3 +47,6 @@ class WalletProvider {
     }
 
 }
+
+
+export { WalletProvider }

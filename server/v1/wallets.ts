@@ -16,7 +16,8 @@ router.get('/', (req, res) => {
             network: config.get("bitcoinNetwork"),
             passphrase: undefined,
             language: 'en',
-        });
+        })
+        
         client.createWallet('testname', 'copayer1', 1, 2, {
             network: config.get("bitcoinNetwork")
         }, function(err, secret) {

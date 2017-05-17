@@ -149,7 +149,7 @@ class BitcoinCoreWallet {
 
         Object.assign(x, obj)
 
-        x.addressManager = CoreAddressManager.fromObj(obj.addressManager)
+        x.addressManager = obj.addressManager ? CoreAddressManager.fromObj(obj.addressManager) : null
 
         return x
     }
