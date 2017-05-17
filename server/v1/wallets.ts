@@ -1,38 +1,68 @@
 import * as express from 'express'
-import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
+//import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
 import * as config from 'config'
+import { WalletProvider } from '../providers/wallet-provider'
 
-
+const walletProvider = new WalletProvider()
 const router = express.Router()
 
-//router.get('/', (req, res) => res.json({ wallet: 'awefweaf'}))
-
-router.get('/', (req, res) => {
-    CoreClient.getClient({ host: config.get('coreWalletServiceHost'), file: 'C:\\weblog\\.wallet.dat' }, { doNotComplete: true }, client => {
-
-        client.seedFromRandomWithMnemonic({
-            network: config.get("bitcoinNetwork"),
-            passphrase: undefined,
-            language: 'en',
-        })
-        
-        client.createWallet('testname', 'copayer1', 1, 2, {
-            network: config.get("bitcoinNetwork")
-        }, function(err, secret) {
-            if (err) {
-                console.log('Error : ', err)
-            }
-            console.log(' * ' + _.capitalize(<string>config.get('bitcoinNetwork')) + ' Wallet Created.')
-            CoreClient.saveClient({ host: config.get('coreWalletServiceHost'), file: 'C:\\weblog\\.wallet.dat' }, client, function() {
-                if (secret) 
-                    console.log('   - Secret to share:\n\t' + secret)
-            
+router.get('/', async (req, res) => {
+    try {
+        let wallets = await walletProvider.fetchWalletsForClients([])
+        res.json({ 
+            wallets: wallets.map(wallet => { 
+                return {
+                    id: wallet.getId(), 
+                    name: wallet.getName(), 
+                    labels: wallet.getLabels() 
+                }
             })
-        })        
-    })
+        })
+    } catch(e) {
+        res.json({ error: e})
+    }
 })
+
+router.post('/', (req, res) => {
+    try {
+        if (!validateWalletName(req.body.name))
+            res.json({ error: 'Invalid wallet name'})
+
+        let walletName = req.body.name
+
+        CoreClient.getClient({ host: config.get('coreWalletServiceHost'), file: 'C:\\weblog\\.wallet.dat' }, { doNotComplete: true }, client => {
+
+            client.seedFromRandomWithMnemonic({
+                network: config.get("bitcoinNetwork"),
+                passphrase: undefined,
+                language: 'en',
+            })
+
+            client.createWallet(walletName, 'copayer1', 1, 2, {
+                network: config.get("bitcoinNetwork")
+            }, function(err, secret) {
+                if (err) 
+                    console.log('Error : ', err)
+                
+                console.log(' * ' + _.capitalize(<string>config.get('bitcoinNetwork')) + ' Wallet Created.')
+                CoreClient.saveClient({ host: config.get('coreWalletServiceHost'), file: 'C:\\weblog\\.wallet.dat' }, client, function() {
+                    if (secret) 
+                        console.log('   - Secret to share:\n\t' + secret)
+                    res.json({ success: 1 })
+                })
+            })        
+        })
+    } catch(e) {
+        res.json({ error: e })
+    }
+})
+
+
+function validateWalletName(name: string) {
+    return true
+}
 
 
 export default router

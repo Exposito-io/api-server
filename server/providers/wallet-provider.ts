@@ -27,6 +27,20 @@ class WalletProvider {
 
     }
 
+    async fetchWalletsForClient(clientId: string|ObjectID) { return this.fetchWalletsForClients([clientId]) }
+
+    async fetchWalletsForClients(clientIds: (string|ObjectID)[]): Promise<Wallet[]> {
+        try {
+            let clientObjectIds = clientIds.map( clientId => typeof clientId === 'string' ? new ObjectID(clientId) : clientId )
+            let db = await dbFactory.getConnection(config.get('database'))
+            let wallets = await db.collection('wallets').find({}).toArray()
+
+            return wallets.map(wallet => Wallet.fromJSON(wallet))
+        } catch(e) {
+            throw('Error fetching wallets')
+        }
+    }
+
 
 
     async createWallet(wallet: BitcoinWallet): Promise<Wallet> {
@@ -35,7 +49,7 @@ class WalletProvider {
 
         try {
             let db = await dbFactory.getConnection(config.get('database'))
-            let result = await db.collection('wallets').insertOne(wallet)
+            let result = await db.collection('wallets').insertOne(wallet.toJSON())
 
             if (result.insertedId)
                 return await this.findById(result.insertedId)

@@ -6,7 +6,7 @@ import * as Client from 'bitcore-wallet-client'
 import FileStorage from './filestorage'
 import * as sjcl from 'sjcl'
 import { WalletProvider } from './providers/wallet-provider'
-import { BitcoinCoreWallet } from "../models/core/bitcoin-core-wallet";
+//import { BitcoinCoreWallet } from "../models/core/bitcoin-core-wallet";
 import { BitcoinWallet } from '../models/bitcoin-wallet'
 
 var WALLET_ENCRYPTION_OPTS = {
@@ -139,18 +139,11 @@ class Utils {
         //str = sjcl.encrypt(password, str, WALLET_ENCRYPTION_OPTS);
         // TODO
       }
-      /*
-      var storage = new FileStorage({
-        filename: filename,
-      });*/
-      /*
-      storage.save(str, function(err) {
-        //throw(err);
-        return cb(err)
-      });*/
+
       let jsonCoreWallet = JSON.parse(str)
-      let wallet = BitcoinCoreWallet.fromObj(jsonCoreWallet)
-      walletProvider.createWallet(new BitcoinWallet(wallet))
+      //let wallet = BitcoinCoreWallet.fromObj(jsonCoreWallet)
+      let wallet = jsonCoreWallet
+      walletProvider.createWallet(new BitcoinWallet({ name: wallet.walletName, coreWallet: wallet, labels: [] }))
       .then(newWallet => {
         cb(null, newWallet)
       })

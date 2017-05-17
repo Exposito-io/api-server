@@ -12,6 +12,11 @@ enum WalletType {
 
 abstract class Wallet {
 
+    constructor(opts: WalletOptions) {
+        this.name = opts.name
+        this.labels = new Set(opts.labels)
+    }
+
     getId() { return this._id }
     getType() { return this.type }
     getName() { return this.name }
@@ -29,7 +34,8 @@ abstract class Wallet {
     }
 
     toJSON(): any {
-        let walletJson = Object.assign({}, this)
+        let walletJson = Object.assign({}, <any>this)
+        walletJson.labels = Array.from(this.getLabels())
         return walletJson
     }
     
@@ -37,7 +43,7 @@ abstract class Wallet {
         if (Wallet.isJsonWalletValid(json)) {
             let wallet = WALLET_TYPES_MAP.get(json.type)(json)
 
-            wallet._id = new ObjectID(json._id)
+            wallet._id = typeof json._id === 'string' ? new ObjectID(json._id) : json._id
             wallet.type = <WalletType>json.type
             wallet.name = json.name
             wallet.labels = new Set(json.labels)
@@ -49,12 +55,13 @@ abstract class Wallet {
 
 
     static isJsonWalletValid(json: any) {
-        return typeof json._id === 'string'
+        // TODO
+        return (typeof json._id === 'string' || json._id instanceof ObjectID)
             && typeof json.name === 'string'
             && typeof json.type === 'number'
             && WALLET_TYPES_MAP.has(json.type)
             && json.labels instanceof Array // TODO mcormier: validate each labels
-            && typeof json._userId === 'string'
+            //&& typeof json._userId === 'string'
     }
 
 
@@ -66,6 +73,14 @@ abstract class Wallet {
 
 }
 
+/**
+ * Wallet constructor options
+ */
+class WalletOptions {
+    name: string
+    labels: string[]
+}
+
 
 
 import { BitcoinWallet } from './bitcoin-wallet'
@@ -75,4 +90,4 @@ const WALLET_TYPES_MAP = new Map<WalletType, Function>([
 ])
 
 
-export { Wallet, WalletType }
+export { Wallet, WalletType, WalletOptions }

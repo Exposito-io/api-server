@@ -1,15 +1,15 @@
-import { Wallet, WalletType } from './wallet'
-import { BitcoinCoreWallet } from './core/bitcoin-core-wallet'
+import { Wallet, WalletType, WalletOptions } from './wallet'
+//import { BitcoinCoreWallet } from './core/bitcoin-core-wallet'
 
 
 class BitcoinWallet extends Wallet {
 
-    protected coreWallet: BitcoinCoreWallet
+    protected coreWallet: any
 
-    constructor(coreWallet?: BitcoinCoreWallet) {
-        super()
+    constructor(opts: BitcoinWalletOptions) {
+        super(opts)
 
-        this.coreWallet = coreWallet
+        this.coreWallet = opts.coreWallet
         this.type = WalletType.BITCOIN
     }
 
@@ -24,8 +24,8 @@ class BitcoinWallet extends Wallet {
 
     toJSON(): any {
         // TODO mcormier
-        let walletJson = super.toJSON()
-        return Object.assign(walletJson, this)
+        let wallet = Object.assign(this, super.toJSON())
+        return wallet
     }
 
 
@@ -33,10 +33,13 @@ class BitcoinWallet extends Wallet {
         if (!BitcoinWallet.isJsonWalletValid(json))
             throw('Invalid wallet JSON')
 
-        let wallet = Wallet.fromJSON(json)        
-        let bitcoinWallet = new BitcoinWallet(BitcoinCoreWallet.fromObj(json.bitcoinWallet))
-
-        Object.assign(bitcoinWallet, wallet)        
+ 
+        let bitcoinWallet = new BitcoinWallet({
+            name: json.name,
+            labels: json.labels,
+            //coreWallet: BitcoinCoreWallet.fromObj(json.bitcoinWallet)
+            coreWallet: json.coreWallet
+        })   
 
         return bitcoinWallet
     }
@@ -44,10 +47,15 @@ class BitcoinWallet extends Wallet {
 
     static isJsonWalletValid(json: any) {
         return Wallet.isJsonWalletValid(json)
-            && json.bitcoinWallet instanceof Object
+            && json.coreWallet instanceof Object
     }
 
 
+}
+
+
+class BitcoinWalletOptions extends WalletOptions {
+    coreWallet: any
 }
 
 
