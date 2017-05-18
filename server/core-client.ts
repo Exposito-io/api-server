@@ -7,7 +7,10 @@ import FileStorage from './filestorage'
 import * as sjcl from 'sjcl'
 import { WalletProvider } from './providers/wallet-provider'
 //import { BitcoinCoreWallet } from "../models/core/bitcoin-core-wallet";
+import { Wallet, WalletType } from '../models/wallet'
 import { BitcoinWallet } from '../models/bitcoin-wallet'
+import * as config from 'config'
+import { ObjectID } from 'mongodb'
 
 var WALLET_ENCRYPTION_OPTS = {
   iter: 5000
@@ -85,7 +88,30 @@ class Utils {
       });
     };
 
-    static getClient(args, opts, cb) {
+    static async getClient(walletId?: string|ObjectID) {
+
+        let client = new Client({
+            baseUrl: url.resolve(<string>config.get('coreWalletServiceHost'), '/bws/api')
+        })
+
+        if (walletId == null) {
+          return client
+        }
+        else {
+          let wallet = await walletProvider.fetchById(walletId)
+          if (wallet.getType() === WalletType.BITCOIN) {
+            let bitcoinWallet = wallet as BitcoinWallet
+            let coreWallet = JSON.stringify(bitcoinWallet.getCoreWallet())
+            Utils.doLoad(client, opts.doNotComplete, coreWallet, null, filename, cb)
+          }
+          else {
+            // TODO mcormier
+          }
+        }
+
+    }
+
+    static getSClient(args, opts, cb) {
       opts = opts || {}
 
       var filename = args.file || process.env['WALLET_FILE'] || process.env['HOME'] + '/.wallet.dat'

@@ -13,7 +13,7 @@ class BitcoinWallet extends Wallet {
         this.type = WalletType.BITCOIN
     }
 
-
+    getCoreWallet() { return this.coreWallet }
 
     isValid(): boolean {
         // TODO mcormier
