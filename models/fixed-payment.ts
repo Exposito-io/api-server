@@ -20,7 +20,7 @@ class FixedPayment extends PeriodicPayment {
 
 
 class FixedPaymentOptions {
-    wallet: Wallet
+    walletId: Wallet
     amount: number
     schedule: string
     type: PeriodicPaymentType
