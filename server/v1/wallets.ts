@@ -36,9 +36,17 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-router.get('/addresses', async (req, res) => {
+router.get('/:id/addresses', async (req, res) => {
     try {
-        
+        let client = await CoreClient.getClient(req.params.id)
+        client.getMainAddresses({
+            doNotVerify: true
+        }, function(err, x) {
+            if (err) throw(err)
+
+            res.json({ res: x })
+
+        });
     } catch(e) {
         res.json({ error: e})
     }

@@ -47,6 +47,42 @@ class Utils {
     }
 
 
+
+    static async doLoad2(client, doNotComplete, walletData, password) {
+      return new Promise((resolve, reject) => {
+
+        if (password) {
+          try {
+            walletData = sjcl.decrypt(password, walletData)
+          } catch (e) {
+            //die('Could not open wallet. Wrong password.');
+            return reject(e)
+          }
+        }
+
+        try {
+          client.import(walletData)
+        } catch (e) {
+          //die('Corrupt wallet file.');
+        }
+        if (doNotComplete) return resolve(client)
+
+
+        client.on('walletCompleted', function(wallet) {
+          /*
+          Utils.doSave(client, filename, password, function() {
+            console.log('Your wallet has just been completed. Please backup your wallet file or use the export command.')
+          })*/
+        })
+        client.openWallet(function(err, isComplete) {
+          if (err) return reject(err)
+
+          return resolve(client)
+        })
+      })
+    }
+
+
     static doLoad(client, doNotComplete, walletData, password, filename, cb) {
       if (password) {
         try {
@@ -102,7 +138,7 @@ class Utils {
           if (wallet.getType() === WalletType.BITCOIN) {
             let bitcoinWallet = wallet as BitcoinWallet
             let coreWallet = JSON.stringify(bitcoinWallet.getCoreWallet())
-            Utils.doLoad(client, opts.doNotComplete, coreWallet, null, filename, cb)
+            return await Utils.doLoad2(client, false, coreWallet, null)
           }
           else {
             // TODO mcormier
