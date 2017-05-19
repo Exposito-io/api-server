@@ -4,6 +4,7 @@ import * as dbFactory from 'mongo-factory'
 import User from '../../models/user'
 import { Wallet } from '../../models/wallet'
 import { BitcoinWallet } from '../../models/bitcoin-wallet'
+import { PeriodicPayment } from '../../models/periodic-payment'
 
 
 class WalletProvider {
@@ -58,6 +59,12 @@ class WalletProvider {
             // TODO mcormier: Handle error
             throw(e)
         }        
+    }
+
+
+    async attachPeriodicPayment(payment: PeriodicPayment, wallet: Wallet) {
+        
+
     }
 
 }

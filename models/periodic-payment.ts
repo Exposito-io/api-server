@@ -7,13 +7,21 @@ abstract class PeriodicPayment {
     getWalletId() { return this._walletId }
     getWallet() { return this.wallet }
 
+    isPaused() { return this.paused }
+    isDeleted() { return this.deleted }
+
 
     protected _id: ObjectID
     protected _walletId: ObjectID
+    protected _outputWalletId: ObjectID
     protected wallet: Wallet
+    protected outputWallet: Wallet
     protected type: PeriodicPayment
     protected cryptoCurrency: CryptoCurrency
+    
 
+    protected paused: boolean
+    protected deleted: boolean
     /*
     static fromJSON(): PeriodicPayment {
 
