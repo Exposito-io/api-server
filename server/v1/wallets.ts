@@ -25,6 +25,42 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.post('/', async (req, res) => {
+    try {
+        if (!validateWalletName(req.body.name))
+            res.json({ error: 'Invalid wallet name'})
+
+        let walletName = req.body.name
+
+        let client = await CoreClient.getClient()
+
+        client.seedFromRandomWithMnemonic({
+            network: config.get("bitcoinNetwork"),
+            passphrase: undefined,
+            language: 'en',
+        })
+
+        client.createWallet(walletName, 'copayer1', 1, 1, {
+            network: config.get("bitcoinNetwork")
+        }, function(err, secret) {
+            
+            if (err) 
+                console.log('Error : ', err)
+            
+            console.log(' * ' + _.capitalize(<string>config.get('bitcoinNetwork')) + ' Wallet Created.')
+            CoreClient.saveClient({ host: config.get('coreWalletServiceHost'), file: 'C:\\weblog\\.wallet.dat' }, client, function() {
+                if (secret) 
+                    console.log('   - Secret to share:\n\t' + secret)
+                res.json({ success: 1 })
+            })
+        })        
+        
+    } catch(e) {
+        res.json({ error: e })
+    }
+})
+
+
 router.get('/:id', async (req, res) => {
     try {
         let wallet = await walletProvider.fetchById(req.params.id)
@@ -88,39 +124,7 @@ router.post('/:id/address', async (req, res) => {
     }
 })
 
-router.post('/', async (req, res) => {
-    try {
-        if (!validateWalletName(req.body.name))
-            res.json({ error: 'Invalid wallet name'})
 
-        let walletName = req.body.name
-
-        let client = await CoreClient.getClient()
-
-        client.seedFromRandomWithMnemonic({
-            network: config.get("bitcoinNetwork"),
-            passphrase: undefined,
-            language: 'en',
-        })
-
-        client.createWallet(walletName, 'copayer1', 1, 1, {
-            network: config.get("bitcoinNetwork")
-        }, function(err, secret) {
-            if (err) 
-                console.log('Error : ', err)
-            
-            console.log(' * ' + _.capitalize(<string>config.get('bitcoinNetwork')) + ' Wallet Created.')
-            CoreClient.saveClient({ host: config.get('coreWalletServiceHost'), file: 'C:\\weblog\\.wallet.dat' }, client, function() {
-                if (secret) 
-                    console.log('   - Secret to share:\n\t' + secret)
-                res.json({ success: 1 })
-            })
-        })        
-        
-    } catch(e) {
-        res.json({ error: e })
-    }
-})
 
 
 function validateWalletName(name: string) {
