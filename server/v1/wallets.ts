@@ -44,9 +44,22 @@ router.get('/:id/addresses', async (req, res) => {
         }, function(err, x) {
             if (err) throw(err)
 
-            res.json({ res: x })
+            res.json({ res: x.map(add => add.address) })
 
         });
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
+router.post('/:id/address', async (req, res) => {
+    try {
+        let client = await CoreClient.getClient(req.params.id)
+        client.createAddress({}, function(err, x) {
+            if (err) throw(err)
+
+            res.json({ res: x.address })
+        })
     } catch(e) {
         res.json({ error: e})
     }
