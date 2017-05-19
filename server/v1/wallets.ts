@@ -52,6 +52,29 @@ router.get('/:id/addresses', async (req, res) => {
     }
 })
 
+
+
+router.get('/:id/balance', async (req, res) => {
+    try {
+        let client = await CoreClient.getClient(req.params.id)
+
+        client.getStatus({}, function(err, status) {
+            if (err) throw(err)
+
+            res.json({
+                balance: CoreClient.renderAmount(status.balance.totalAmount),
+                locked: CoreClient.renderAmount(status.balance.lockedAmount)
+            })
+
+        })
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
+
+
+
 router.post('/:id/address', async (req, res) => {
     try {
         let client = await CoreClient.getClient(req.params.id)
