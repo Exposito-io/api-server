@@ -47,7 +47,7 @@ router.post('/', async (req, res) => {
             if (err) 
                 console.log('Error : ', err)
             
-            console.log(' * ' + _.capitalize(<string>config.get('bitcoinNetwork')) + ' Wallet Created.')
+            console.log(' * ' + _.capitalize(config.get('bitcoinNetwork') as string) + ' Wallet Created.')
             CoreClient.saveClient({ host: config.get('coreWalletServiceHost'), file: 'C:\\weblog\\.wallet.dat' }, client, function() {
                 if (secret) 
                     console.log('   - Secret to share:\n\t' + secret)
@@ -120,6 +120,60 @@ router.post('/:id/address', async (req, res) => {
             res.json({ res: x.address })
         })
     } catch(e) {
+        res.json({ error: e})
+    }
+})
+
+
+router.post('/:id/send', async (req, res) => {
+    try {
+        let client = await CoreClient.getClient(req.params.id)
+        let amount = CoreClient.parseAmount(req.body.amount)
+        let feePerKb = !_.isUndefined(req.body.fee) ? CoreClient.parseAmount(req.body.fee) : 100e2
+        let address = req.body.address
+        let note = req.body.note || ''
+
+        client.createTxProposal({
+            outputs: [{
+            toAddress: address,
+            amount: amount,
+            }],
+            message: note,
+            feePerKb: feePerKb,
+        }, function(err, txp) {
+            if (err) throw(err)
+
+            client.publishTxProposal({
+                txp: txp
+            }, function(err) {
+                if (err) throw(err)
+
+                //res.json({ tid: CoreClient.shortID(txp.id) })
+                let txpid = CoreClient.shortID(txp.id)
+
+                client.getTxProposals({}, function(err, txps) {
+                    if (err) throw(err)
+
+                    let txp = CoreClient.findOneTxProposal(txps, txpid)
+
+                    client.signTxProposal(txp, function(err, tx) {
+                        if (err) throw(err)
+
+                        console.log('Transaction signed by you.')
+
+                        client.broadcastTxProposal(txp, function(err, txp) {
+                            if (err) throw(err)
+                            console.log('Transaction Broadcasted: TXID: ' + txp.txid)
+                            res.json({ success: true })
+                        })
+                    })
+                })
+                /*
+                console.log(' * Tx created: ID %s [%s] RequiredSignatures:',
+                    CoreClient.shortID(txp.id), txp.status, txp.requiredSignatures);*/
+            })
+        });
+    } catch (e) {
         res.json({ error: e})
     }
 })
