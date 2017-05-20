@@ -164,7 +164,7 @@ router.post('/:id/send', async (req, res) => {
                         client.broadcastTxProposal(txp, function(err, txp) {
                             if (err) throw(err)
                             console.log('Transaction Broadcasted: TXID: ' + txp.txid)
-                            res.json({ success: true })
+                            res.json({ success: true, txid: txp.txid })
                         })
                     })
                 })
