@@ -40,21 +40,21 @@ router.post('/', async (req, res) => {
             language: 'en',
         })
 
-        client.createWallet(walletName, 'copayer1', 1, 1, {
+        let secret = await client.createWallet(walletName, 'copayer1', 1, 1, {
             network: config.get("bitcoinNetwork")
-        }, function(err, secret) {
-            
-            if (err) 
-                console.log('Error : ', err)
-            
-            console.log(' * ' + _.capitalize(config.get('bitcoinNetwork') as string) + ' Wallet Created.')
-            CoreClient.saveClient({ host: config.get('coreWalletServiceHost'), file: 'C:\\weblog\\.wallet.dat' }, client, function() {
-                if (secret) 
-                    console.log('   - Secret to share:\n\t' + secret)
-                res.json({ success: 1 })
-            })
-        })        
-        
+        })
+
+
+        console.log(' * ' + _.capitalize(config.get('bitcoinNetwork') as string) + ' Wallet Created.')
+        await CoreClient.saveClient({ host: config.get('coreWalletServiceHost'), file: 'C:\\weblog\\.wallet.dat' }, client)
+
+        if (secret)
+            console.log('   - Secret to share:\n\t' + secret)
+
+        res.json({ success: 1 })
+
+
+
     } catch(e) {
         res.json({ error: e })
     }
@@ -75,14 +75,11 @@ router.get('/:id', async (req, res) => {
 router.get('/:id/addresses', async (req, res) => {
     try {
         let client = await CoreClient.getClient(req.params.id)
-        client.getMainAddresses({
-            doNotVerify: true
-        }, function(err, x) {
-            if (err) throw(err)
+        let x = await client.getMainAddresses({ doNotVerify: true })
 
-            res.json({ res: x.map(add => add.address) })
+        res.json({ res: x.map(add => add.address) })
 
-        });
+
     } catch(e) {
         res.json({ error: e})
     }
@@ -92,17 +89,15 @@ router.get('/:id/addresses', async (req, res) => {
 
 router.get('/:id/balance', async (req, res) => {
     try {
+
         let client = await CoreClient.getClient(req.params.id)
+        let status = await client.getStatus({})
 
-        client.getStatus({}, function(err, status) {
-            if (err) throw(err)
-
-            res.json({
-                balance: CoreClient.renderAmount(status.balance.totalAmount),
-                locked: CoreClient.renderAmount(status.balance.lockedAmount)
-            })
-
+        res.json({
+            balance: CoreClient.renderAmount(status.balance.totalAmount),
+            locked: CoreClient.renderAmount(status.balance.lockedAmount)
         })
+
     } catch(e) {
         res.json({ error: e})
     }
@@ -114,11 +109,10 @@ router.get('/:id/balance', async (req, res) => {
 router.post('/:id/address', async (req, res) => {
     try {
         let client = await CoreClient.getClient(req.params.id)
-        client.createAddress({}, function(err, x) {
-            if (err) throw(err)
+        let x = await client.createAddress({})
 
-            res.json({ res: x.address })
-        })
+        res.json({ res: x.address })
+
     } catch(e) {
         res.json({ error: e})
     }
@@ -133,46 +127,37 @@ router.post('/:id/send', async (req, res) => {
         let address = req.body.address
         let note = req.body.note || ''
 
-        client.createTxProposal({
+        let txp = await client.createTxProposal({
             outputs: [{
-            toAddress: address,
-            amount: amount,
+                toAddress: address,
+                amount: amount,
             }],
             message: note,
             feePerKb: feePerKb,
-        }, function(err, txp) {
-            if (err) throw(err)
+        })
 
-            client.publishTxProposal({
-                txp: txp
-            }, function(err) {
-                if (err) throw(err)
+        await client.publishTxProposal({ txp: txp })
 
-                //res.json({ tid: CoreClient.shortID(txp.id) })
-                let txpid = CoreClient.shortID(txp.id)
+        //res.json({ tid: CoreClient.shortID(txp.id) })
+        let txpid = CoreClient.shortID(txp.id)
 
-                client.getTxProposals({}, function(err, txps) {
-                    if (err) throw(err)
+        let txps = await client.getTxProposals({})
 
-                    let txp = CoreClient.findOneTxProposal(txps, txpid)
+        let txp1 = CoreClient.findOneTxProposal(txps, txpid)
 
-                    client.signTxProposal(txp, function(err, tx) {
-                        if (err) throw(err)
+        let tx = await client.signTxProposal(txp1)
 
-                        console.log('Transaction signed by you.')
+        console.log('Transaction signed by you.')
 
-                        client.broadcastTxProposal(txp, function(err, txp) {
-                            if (err) throw(err)
-                            console.log('Transaction Broadcasted: TXID: ' + txp.txid)
-                            res.json({ success: true, txid: txp.txid })
-                        })
-                    })
-                })
-                /*
-                console.log(' * Tx created: ID %s [%s] RequiredSignatures:',
-                    CoreClient.shortID(txp.id), txp.status, txp.requiredSignatures);*/
-            })
-        });
+        let txp2 = await client.broadcastTxProposal(txp1)
+
+        console.log('Transaction Broadcasted: TXID: ' + txp2.txid)
+        res.json({ success: true, txid: txp2.txid })
+
+        /*
+        console.log(' * Tx created: ID %s [%s] RequiredSignatures:',
+            CoreClient.shortID(txp.id), txp.status, txp.requiredSignatures);*/
+
     } catch (e) {
         res.json({ error: e})
     }

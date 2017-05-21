@@ -2,7 +2,8 @@ import * as _ from 'lodash'
 import * as url from 'url'
 import * as read from 'read'
 import * as log from 'npmlog' 
-import * as Client from 'bitcore-wallet-client'
+//import * as Client from 'bitcore-wallet-client'
+import { Client } from 'core-bitcoin-client'
 import FileStorage from './filestorage'
 import * as sjcl from 'sjcl'
 import { WalletProvider } from './providers/wallet-provider'
@@ -232,16 +233,26 @@ class Utils {
       })
     }
 
-    static saveClient(args, client, cb) {
-      var filename = args.file || process.env['WALLET_FILE'] || process.env['HOME'] + '/.wallet.dat';
-      console.log(' * Saving file', filename);
+    static async saveClient(args, client) {
+      return new Promise((resolve, reject) => {
+        let cb = err => {
+          if (err) {
+            return reject(err)
+          }
 
-      if (args.password) {
-        Utils.saveEncrypted(client, filename, cb);
-      } else {
-        Utils.doSave(client, filename, null, cb);
-      };
-    };
+          return resolve()
+        }
+
+        let filename = args.file || process.env['WALLET_FILE'] || process.env['HOME'] + '/.wallet.dat';
+        console.log(' * Saving file', filename);
+
+        if (args.password) {
+          Utils.saveEncrypted(client, filename, cb);
+        } else {
+          Utils.doSave(client, filename, null, cb);
+        }
+      })
+    }
 
     static findOneTxProposal(txps, id) {
       var matches = _.filter<any>(txps, function(tx) {
