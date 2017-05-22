@@ -4,8 +4,12 @@ import CoreClient from '../core-client'
 import * as _ from 'lodash'
 import * as config from 'config'
 import { WalletProvider } from '../providers/wallet-provider'
+import { PeriodicPaymentProvider } from '../providers/periodic-payment-provider'
+import { FixedPayment } from '../../models/fixed-payment'
 
 const walletProvider = new WalletProvider()
+const paymentProvider = new PeriodicPaymentProvider()
+
 const router = express.Router()
 
 router.get('/', async (req, res) => {
@@ -104,6 +108,20 @@ router.get('/:id/balance', async (req, res) => {
 })
 
 
+
+router.post('/:id/fixed-payment', async (req, res) => {
+    try {
+        let periodicPayment = new FixedPayment({
+            walletId: req.params.id,
+            amount: 2,
+            schedule: 'wef'
+        })
+        await paymentProvider.createPeriodicPayment(periodicPayment)
+        res.json({ success: 1 })
+    } catch (e) {
+        res.json({ error: e})
+    }
+})
 
 
 router.post('/:id/address', async (req, res) => {

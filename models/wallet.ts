@@ -27,7 +27,7 @@ abstract class Wallet {
     addLabel(label: string) { this.labels.add(label) }
     removeLabel(label: string) { this.labels.delete(label) }
 
-    
+
     isValid(): boolean {
         // TODO mcormier
         return true
@@ -42,7 +42,8 @@ abstract class Wallet {
     toFrontendJSON(): any {
         return this.toJSON()
     }
-    
+
+
     static fromJSON(json: any): Wallet {
         if (Wallet.isJsonWalletValid(json)) {
             let wallet = WALLET_TYPES_MAP.get(json.type)(json)
@@ -52,6 +53,7 @@ abstract class Wallet {
             wallet.name = json.name
             wallet.labels = new Set(json.labels)
             wallet._userId = json._userId
+            wallet._periodicPaymentIds = json._periodicPaymentIds
 
             return wallet
         }
@@ -71,7 +73,8 @@ abstract class Wallet {
 
     protected _id: ObjectID
     protected _userId: ObjectID
-    protected type: CryptoCurrency = CryptoCurrency.UNKNOWN    
+    protected _periodicPaymentIds: ObjectID[] = []
+    protected type: CryptoCurrency = CryptoCurrency.UNKNOWN
     protected name: string
     protected labels: Set<string> = new Set<string>()
 

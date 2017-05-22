@@ -1,7 +1,18 @@
 import { ObjectID } from 'mongodb'
 import { Wallet, CryptoCurrency } from './wallet'
 
+
+
 abstract class PeriodicPayment {
+
+
+    constructor(opts: PeriodicPaymentOptions) {
+        if (typeof opts.walletId === 'string')
+            opts.walletId = new ObjectID(opts.walletId)
+
+        this._walletId = opts.walletId
+        this.type = opts.type
+    }
 
     getId() { return this._id }
     getWalletId() { return this._walletId }
@@ -16,22 +27,43 @@ abstract class PeriodicPayment {
     protected _outputWalletId: ObjectID
     protected wallet: Wallet
     protected outputWallet: Wallet
-    protected type: PeriodicPayment
+    protected type: PeriodicPaymentType
     protected cryptoCurrency: CryptoCurrency
-    
+
 
     protected paused: boolean
     protected deleted: boolean
-    /*
-    static fromJSON(): PeriodicPayment {
 
-    }*/
+    static isValidJSON(json: any): boolean {
+        if (!(json instanceof Object))
+            return false
+
+        // Full object validation
+        if (json._id) {
+            // TODO
+            return true
+        }
+        // Partial object validation
+        else {
+            // TODO
+            return true
+        }
+    }
+
+    static fromJSON(json: Object): PeriodicPayment {
+        let periodicPayment = PERIODIC_PAYMENT_CLASSES.find(p => p.isValidJSON(json) && PeriodicPayment.isValidJSON(json))[0]
+
+        if (periodicPayment == null)
+            throw('Invalid JSON')
+
+        return periodicPayment
+    }
 
 }
 
 
 class PeriodicPaymentOptions {
-    wallet: Wallet
+    walletId: ObjectID|string
     type: PeriodicPaymentType
 }
 
@@ -42,4 +74,13 @@ enum PeriodicPaymentType {
 }
 
 
-export { PeriodicPayment, PeriodicPaymentType }
+
+import { FixedPayment } from './fixed-payment'
+
+
+const PERIODIC_PAYMENT_CLASSES = [
+    FixedPayment
+]
+
+
+export { PeriodicPayment, PeriodicPaymentType, PeriodicPaymentOptions }
