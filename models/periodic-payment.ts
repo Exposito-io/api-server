@@ -12,14 +12,24 @@ abstract class PeriodicPayment {
 
         this._walletId = opts.walletId
         this.type = opts.type
+        this.schedule = opts.schedule
     }
 
     getId() { return this._id }
     getWalletId() { return this._walletId }
     getWallet() { return this.wallet }
+    getSchedule() { return this.schedule }
 
     isPaused() { return this.paused }
     isDeleted() { return this.deleted }
+
+
+    getNextPaymentTime() {
+        return new Date()
+    }
+
+
+    abstract getNextPaymentEstimateAmount(): number
 
 
     protected _id: ObjectID
@@ -29,6 +39,7 @@ abstract class PeriodicPayment {
     protected outputWallet: Wallet
     protected type: PeriodicPaymentType
     protected cryptoCurrency: CryptoCurrency
+    protected schedule: string
 
 
     protected paused: boolean
@@ -65,6 +76,7 @@ abstract class PeriodicPayment {
 class PeriodicPaymentOptions {
     walletId: ObjectID|string
     type: PeriodicPaymentType
+    schedule: string
 }
 
 enum PeriodicPaymentType {

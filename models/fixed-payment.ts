@@ -5,9 +5,11 @@ import { ObjectID } from 'mongodb'
 
 class FixedPayment extends PeriodicPayment {
 
+
     constructor(opts: FixedPaymentOptions) {
         super({
             walletId: opts.walletId,
+            schedule: opts.schedule,
             type: PeriodicPaymentType.FIXED
         })
 
@@ -19,11 +21,15 @@ class FixedPayment extends PeriodicPayment {
 
 
     getAmount() { return this.amount }
-    setAmount(amount: number) { this.amount = amount }
+
+
+    getNextPaymentEstimateAmount(): number {
+        return this.amount
+    }
 
 
     protected amount: number
-    protected schedule: string
+
 
 
     static isValidJSON(json: any): boolean {
