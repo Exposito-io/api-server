@@ -11,14 +11,22 @@ abstract class PeriodicPayment {
         if (typeof opts.walletId === 'string')
             opts.walletId = new ObjectID(opts.walletId)
 
-        this._walletOutId = opts.walletId
+        if (typeof opts.recipientWalletId === 'string')
+            opts.recipientWalletId = new ObjectID(opts.recipientWalletId)            
+
+        this._walletId = opts.walletId
+        this._recipientWalletId = opts.recipientWalletId
         this.type = opts.type
         this.schedule = opts.schedule
     }
 
     getId() { return this._id }
-    getWalletOutId() { return this._walletOutId }
-    getWalletOut() { return this.wallet }
+    getWalletId() { return this._walletId }
+    getWallet() { return this.wallet }
+    
+    getRecipientWalletId() { return this._recipientWalletId }
+    getRecipientWallet() { return this.recipientWallet }
+
     getSchedule() { return this.schedule }
 
     isPaused() { return this.paused }
@@ -42,10 +50,11 @@ abstract class PeriodicPayment {
 
 
     protected _id: ObjectID
-    protected _walletOutId: ObjectID
-    protected _outputWalletId: ObjectID
+    protected _walletId: ObjectID
+    protected _recipientWalletId: ObjectID
+
     protected wallet: Wallet
-    protected outputWallet: Wallet
+    protected recipientWallet: Wallet
     protected type: PeriodicPaymentType
     protected cryptoCurrency: CryptoCurrency
     protected schedule: string
@@ -84,6 +93,7 @@ abstract class PeriodicPayment {
 
 class PeriodicPaymentOptions {
     walletId: ObjectID|string
+    recipientWalletId: ObjectID|string
     type: PeriodicPaymentType
     schedule: string
 }
