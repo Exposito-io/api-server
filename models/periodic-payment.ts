@@ -1,5 +1,6 @@
 import { ObjectID } from 'mongodb'
 import { Wallet, CryptoCurrency } from './wallet'
+import * as Money from 'js-money'
 
 
 
@@ -10,14 +11,14 @@ abstract class PeriodicPayment {
         if (typeof opts.walletId === 'string')
             opts.walletId = new ObjectID(opts.walletId)
 
-        this._walletId = opts.walletId
+        this._walletOutId = opts.walletId
         this.type = opts.type
         this.schedule = opts.schedule
     }
 
     getId() { return this._id }
-    getWalletId() { return this._walletId }
-    getWallet() { return this.wallet }
+    getWalletOutId() { return this._walletOutId }
+    getWalletOut() { return this.wallet }
     getSchedule() { return this.schedule }
 
     isPaused() { return this.paused }
@@ -28,12 +29,20 @@ abstract class PeriodicPayment {
         return new Date()
     }
 
+    /**
+     * Returns an estimate of the next payment 
+     * amount
+     */
+    abstract getNextPaymentEstimateAmount(): Money
 
-    abstract getNextPaymentEstimateAmount(): number
+    /**
+     * Returns the current payment amount
+     */
+    abstract getPaymentAmount(): Money
 
 
     protected _id: ObjectID
-    protected _walletId: ObjectID
+    protected _walletOutId: ObjectID
     protected _outputWalletId: ObjectID
     protected wallet: Wallet
     protected outputWallet: Wallet

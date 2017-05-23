@@ -1,10 +1,12 @@
 import { PeriodicPayment, PeriodicPaymentType, PeriodicPaymentOptions } from './periodic-payment'
 import { Wallet } from './wallet'
 import { ObjectID } from 'mongodb'
+import * as Money from 'js-money'
+
+
 
 
 class FixedPayment extends PeriodicPayment {
-
 
     constructor(opts: FixedPaymentOptions) {
         super({
@@ -23,12 +25,16 @@ class FixedPayment extends PeriodicPayment {
     getAmount() { return this.amount }
 
 
-    getNextPaymentEstimateAmount(): number {
+    getPaymentAmount() {
+        return this.amount
+    }
+
+    getNextPaymentEstimateAmount() {
         return this.amount
     }
 
 
-    protected amount: number
+    protected amount: Money
 
 
 
@@ -74,7 +80,7 @@ class FixedPayment extends PeriodicPayment {
 
 class FixedPaymentOptions {
     walletId: string | ObjectID
-    amount: number
+    amount: Money
     schedule: string
     isPaused?: boolean
 }

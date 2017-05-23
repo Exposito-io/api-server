@@ -48,6 +48,7 @@
     "ejs": "2.5.1",
     "express": "4.14.0",
     "express-session": "^1.15.2",
+    "js-money": "^0.6.3",
     "lodash": "^4.17.4",
     "mongo-factory": "^1.0.0",
     "mongodb": "^2.2.26",
