@@ -113,6 +113,7 @@ router.post('/:id/fixed-payment', async (req, res) => {
     try {
         let periodicPayment = new FixedPayment({
             walletId: req.params.id,
+            recipientWalletId: req.params.id,
             amount: 2,
             schedule: 'wef'
         })
