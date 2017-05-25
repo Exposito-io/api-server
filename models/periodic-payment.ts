@@ -8,24 +8,24 @@ abstract class PeriodicPayment {
 
 
     constructor(opts: PeriodicPaymentOptions) {
-        if (typeof opts.walletId === 'string')
-            opts.walletId = new ObjectID(opts.walletId)
+        if (typeof opts.sourceWalletId === 'string')
+            opts.sourceWalletId = new ObjectID(opts.sourceWalletId)
 
-        if (typeof opts.recipientWalletId === 'string')
-            opts.recipientWalletId = new ObjectID(opts.recipientWalletId)            
+        if (typeof opts.destinationWalletId === 'string')
+            opts.destinationWalletId = new ObjectID(opts.destinationWalletId)            
 
-        this._walletId = opts.walletId
-        this._recipientWalletId = opts.recipientWalletId
+        this._sourceWalletId = opts.sourceWalletId
+        this._destinationWalletId = opts.destinationWalletId
         this.type = opts.type
         this.schedule = opts.schedule
     }
 
     getId() { return this._id }
-    getWalletId() { return this._walletId }
-    getWallet() { return this.wallet }
-    
-    getRecipientWalletId() { return this._recipientWalletId }
-    getRecipientWallet() { return this.recipientWallet }
+    getSourceWalletId() { return this._sourceWalletId }
+    getSourceWallet() { return this.sourceWallet }
+
+    getDestinationWalletId() { return this._destinationWalletId }
+    getDestinationWallet() { return this.destinationWallet }
 
     getSchedule() { return this.schedule }
 
@@ -50,11 +50,11 @@ abstract class PeriodicPayment {
 
 
     protected _id: ObjectID
-    protected _walletId: ObjectID
-    protected _recipientWalletId: ObjectID
+    protected _sourceWalletId: ObjectID
+    protected _destinationWalletId: ObjectID
 
-    protected wallet: Wallet
-    protected recipientWallet: Wallet
+    protected sourceWallet: Wallet
+    protected destinationWallet: Wallet
     protected type: PeriodicPaymentType
     protected cryptoCurrency: CryptoCurrency
     protected schedule: string
@@ -92,8 +92,8 @@ abstract class PeriodicPayment {
 
 
 class PeriodicPaymentOptions {
-    walletId: ObjectID|string
-    recipientWalletId: ObjectID|string
+    sourceWalletId: ObjectID|string
+    destinationWalletId: ObjectID|string
     type: PeriodicPaymentType
     schedule: string
 }

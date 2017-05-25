@@ -44,7 +44,7 @@ class PeriodicPaymentProvider {
 
         if (insertResult.insertedCount === 1) {
             let updateResult = await db.collection('wallets')
-                                 .updateOne({ _id: periodicPayment.getWalletId() },
+                                 .updateOne({ _id: periodicPayment.getSourceWalletId() },
                                  { $push: { _periodicPaymentIds: insertResult.insertedId }})
             if (updateResult.modifiedCount === 1)
                 return insertResult.insertedId

@@ -10,8 +10,8 @@ class FixedPayment extends PeriodicPayment {
 
     constructor(opts: FixedPaymentOptions) {
         super({
-            walletId: opts.walletId,
-            recipientWalletId: opts.recipientWalletId,
+            sourceWalletId: opts.sourceWalletId,
+            destinationWalletId: opts.destinationWalletId,
             schedule: opts.schedule,
             type: PeriodicPaymentType.FIXED
         })
@@ -63,8 +63,8 @@ class FixedPayment extends PeriodicPayment {
         let periodicPayment = PeriodicPayment.fromJSON(json)
 
         let fixedPayment = new FixedPayment({
-            walletId: json.walletId,
-            recipientWalletId: json.recipientWalletId,
+            sourceWalletId: json.walletId,
+            destinationWalletId: json.recipientWalletId,
             amount: json.amount,
             schedule: json.schedule
         })
@@ -81,8 +81,8 @@ class FixedPayment extends PeriodicPayment {
 
 
 class FixedPaymentOptions {
-    walletId: string | ObjectID
-    recipientWalletId: string | ObjectID
+    sourceWalletId: string | ObjectID
+    destinationWalletId: string | ObjectID
     amount: Money
     schedule: string
     isPaused?: boolean
