@@ -23,7 +23,7 @@ describe('ExpositoError', () => {
         chai.assert.notEqual(error.message, '')
     })
 
-    it('overwrights the default error message if provided in constructor', async () => {
+    it('overwrites the default error message if provided in constructor', async () => {
         let customMessage = 'Custom message!'
         let error = new ExpositoError(ErrorCode.UNKNOWN, customMessage)
 
