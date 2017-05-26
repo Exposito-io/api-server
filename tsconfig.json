@@ -16,7 +16,8 @@
             "*": ["*"]
         },
         "typeRoots": [
-        ]
+        ],
+        "types": ["chai", "mocha"]
     },
     "include": [
         "bin/www.ts"
