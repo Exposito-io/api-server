@@ -12,10 +12,12 @@ class ExpositoError extends Error {
 
 enum ErrorCode {
     UNKNOWN = 0,
+    INVALID_WALLET = 1
 }
 
 const defaultErrorMessages = new Map<ErrorCode, string>([
-    [ErrorCode.UNKNOWN, 'Unknown error']
+    [ErrorCode.UNKNOWN, 'Unknown error'],
+    [ErrorCode.INVALID_WALLET, 'Invalid wallet']
 ])
 
 export { ExpositoError, ErrorCode }
