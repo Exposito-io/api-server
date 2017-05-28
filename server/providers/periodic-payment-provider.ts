@@ -14,6 +14,7 @@ class PeriodicPaymentProvider {
         let res = await db.collection('fwaef').insert({})
         res.insertedId
     }
+
     /**
      * Returns a PeriodicPayment object from its id
      *
@@ -30,6 +31,19 @@ class PeriodicPaymentProvider {
             throw('No periodic payment found')
         else
             return PeriodicPayment.fromJSON(periodicPayments[0])
+
+    }
+
+
+    async fetchPeriodicPaymentForClient(clientId: string|ObjectID) { return this.fetchPeriodicPaymentForClients([clientId]) }
+
+    async fetchPeriodicPaymentForClients(clientIds: (string|ObjectID)[]) {
+
+        let clientObjectIds = clientIds.map( clientId => typeof clientId === 'string' ? new ObjectID(clientId) : clientId )
+        let db = await dbFactory.getConnection(config.get('database'))
+        let periodicPayments = await db.collection('periodic-payments').find({ }).toArray()
+
+        return periodicPayments.map(periodicPayment => PeriodicPayment.fromJSON(periodicPayment))
 
     }
 

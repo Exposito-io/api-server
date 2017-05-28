@@ -80,12 +80,14 @@ abstract class PeriodicPayment {
     }
 
     static fromJSON(json: Object): PeriodicPayment {
-        let periodicPayment = PERIODIC_PAYMENT_CLASSES.find(p => p.isValidJSON(json) && PeriodicPayment.isValidJSON(json))[0]
+        let periodicPaymentClass = PERIODIC_PAYMENT_CLASSES.find(p => p.isValidJSON(json) && PeriodicPayment.isValidJSON(json))
 
-        if (periodicPayment == null)
+        if (periodicPaymentClass == null)
             throw('Invalid JSON')
 
+        let periodicPayment = Object.assign({}, json, periodicPaymentClass.fromJSON(json))
         return periodicPayment
+
     }
 
 }

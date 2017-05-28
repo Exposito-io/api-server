@@ -60,16 +60,12 @@ class FixedPayment extends PeriodicPayment {
         if (!FixedPayment.isValidJSON(json))
             throw('Invalid JSON')
 
-        let periodicPayment = PeriodicPayment.fromJSON(json)
-
         let fixedPayment = new FixedPayment({
             sourceWalletId: json.walletId,
             destinationWalletId: json.recipientWalletId,
             amount: json.amount,
             schedule: json.schedule
         })
-
-        Object.assign(fixedPayment, periodicPayment)
 
         Object.assign(fixedPayment, json)
 
