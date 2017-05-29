@@ -12,7 +12,7 @@ abstract class PeriodicPayment {
             opts.sourceWalletId = new ObjectID(opts.sourceWalletId)
 
         if (typeof opts.destinationWalletId === 'string')
-            opts.destinationWalletId = new ObjectID(opts.destinationWalletId)            
+            opts.destinationWalletId = new ObjectID(opts.destinationWalletId)
 
         this._sourceWalletId = opts.sourceWalletId
         this._destinationWalletId = opts.destinationWalletId

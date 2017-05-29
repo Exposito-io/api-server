@@ -36,5 +36,19 @@ router.get('/:id', async (req, res) => {
     }
 })
 
+router.post('/', async (req, res) => {
+    try {
+        let periodicPayment = await paymentProvider.createPeriodicPayment({
+            _sourceWalletId: req.body.sourceWalletId,
+            _destinationWalletId: 
+        })
+
+        res.json(periodicPayment)
+
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
 
 export default router
