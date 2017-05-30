@@ -5,7 +5,7 @@ import * as _ from 'lodash'
 import * as config from 'config'
 import { WalletProvider } from '../providers/wallet-provider'
 import { PeriodicPaymentProvider } from '../providers/periodic-payment-provider'
-import { FixedPayment, FixedPaymentOptions } from '../../models/fixed-payment'
+import { FixedPayment, FixedPaymentOptions } from 'models'
 
 const walletProvider = new WalletProvider()
 const paymentProvider = new PeriodicPaymentProvider()

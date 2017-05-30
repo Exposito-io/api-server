@@ -8,8 +8,7 @@ import FileStorage from './filestorage'
 import * as sjcl from 'sjcl'
 import { WalletProvider } from './providers/wallet-provider'
 //import { BitcoinCoreWallet } from "../models/core/bitcoin-core-wallet";
-import { Wallet, CryptoCurrency } from '../models/wallet'
-import { BitcoinWallet } from '../models/bitcoin-wallet'
+import { Wallet, CryptoCurrency, BitcoinWallet } from 'models'
 import * as config from 'config'
 import { ObjectID } from 'mongodb'
 
