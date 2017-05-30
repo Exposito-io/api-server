@@ -55,6 +55,7 @@
     "mongodb": "^2.2.26",
     "morgan": "1.7.0",
     "npmlog": "^4.1.0",
+    "open-exchange-rates": "^0.3.0",
     "passport": "^0.3.2",
     "passport-google-oauth2": "^0.1.6",
     "preconditions": "^2.2.0",
