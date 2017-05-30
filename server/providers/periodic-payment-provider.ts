@@ -1,19 +1,12 @@
-import { ObjectID, Db, Server } from 'mongodb'
+import { ObjectID, Collection } from 'mongodb'
 import * as config from 'config'
 import * as dbFactory from 'mongo-factory'
-import { Wallet } from '../../models/wallet'
-import { BitcoinWallet } from '../../models/bitcoin-wallet'
-import { PeriodicPayment } from '../../models/periodic-payment'
+import { BitcoinWallet, PeriodicPayment, FixedPayment, FixedPaymentOptions, Wallet } from 'models'
 
 
 
 class PeriodicPaymentProvider {
 
-    async tmp() {
-        let db = new Db('faew', new Server('feaw', 324))
-        let res = await db.collection('fwaef').insert({})
-        res.insertedId
-    }
 
     /**
      * Returns a PeriodicPayment object from its id
@@ -48,10 +41,11 @@ class PeriodicPaymentProvider {
     }
 
     // TODO: convert periodicPayment arg to PeriodicPaymentRequest ??
-    async createFixedPeriodicPayment(periodicPayment: PeriodicPayment) {
+    async createFixedPeriodicPayment(paymentOpts: FixedPaymentOptions) {
         // TODO: Validate
         // TODO: Transaction
-
+        
+        let periodicPayment = FixedPayment.fromOptions(paymentOpts)
         let db = await dbFactory.getConnection(config.get('database'))
 
         let insertResult = await db.collection('periodic-payments').insertOne(periodicPayment)
@@ -60,6 +54,7 @@ class PeriodicPaymentProvider {
             let updateResult = await db.collection('wallets')
                                  .updateOne({ _id: periodicPayment.getSourceWalletId() },
                                  { $push: { _periodicPaymentIds: insertResult.insertedId }})
+
             if (updateResult.modifiedCount === 1)
                 return insertResult.insertedId
             else
