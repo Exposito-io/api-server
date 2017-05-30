@@ -111,14 +111,14 @@ router.get('/:id/balance', async (req, res) => {
 
 router.post('/:id/fixed-payment', async (req, res) => {
     try {
-        let periodicPayment = new FixedPaymentOptions({
+        await paymentProvider.createFixedPeriodicPayment({
             sourceWalletId: req.params.id,
             destinationWalletId: req.params.id,
             amount: req.body.amount,
             currency: req.body.currency,
-            schedule: '1 * * * * *'
+            schedule: '1 * * * * *',
+            
         })
-        await paymentProvider.createFixedPeriodicPayment(periodicPayment)
         res.json({ success: 1 })
     } catch (e) {
         res.json({ error: e})
