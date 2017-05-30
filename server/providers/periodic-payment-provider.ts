@@ -41,9 +41,9 @@ class PeriodicPaymentProvider {
     }
 
     // TODO: convert periodicPayment arg to PeriodicPaymentRequest ??
-    async createFixedPeriodicPayment(paymentOpts: FixedPaymentOptions) {
-        // TODO: Validate
+    async createFixedPeriodicPayment(paymentOpts: FixedPaymentOptions): Promise<PeriodicPayment> {
         // TODO: Transaction
+        // TODO: Validate sourceWalletId and destinationWalletId
         
         let periodicPayment = FixedPayment.fromOptions(paymentOpts)
         let db = await dbFactory.getConnection(config.get('database'))
@@ -55,10 +55,11 @@ class PeriodicPaymentProvider {
                                  .updateOne({ _id: periodicPayment.getSourceWalletId() },
                                  { $push: { _periodicPaymentIds: insertResult.insertedId }})
 
-            if (updateResult.modifiedCount === 1)
-                return insertResult.insertedId
-            else
+            if (updateResult.modifiedCount !== 1)
                 throw('Error updating Wallet')
+            
+            return this.fetchById(insertResult.insertedId)
+                
         }
         else {
             throw('Problem inserting PeriodicPayment')
