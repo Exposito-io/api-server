@@ -38,7 +38,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        let periodicPayment = await paymentProvider.createPeriodicPayment({
+        let periodicPayment = await paymentProvider.createFixedPeriodicPayment({
             _sourceWalletId: req.body.sourceWalletId,
             _destinationWalletId: 
         })

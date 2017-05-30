@@ -48,7 +48,7 @@ class PeriodicPaymentProvider {
     }
 
     // TODO: convert periodicPayment arg to PeriodicPaymentRequest ??
-    async createPeriodicPayment(periodicPayment: PeriodicPayment) {
+    async createFixedPeriodicPayment(periodicPayment: PeriodicPayment) {
         // TODO: Validate
         // TODO: Transaction
 
