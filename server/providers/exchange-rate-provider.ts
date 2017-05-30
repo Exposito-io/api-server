@@ -1,4 +1,5 @@
 import * as oxr from 'open-exchange-rates'
+import * as Money from 'js-money'
 
 
 export class ExchangeRateProvider {
@@ -7,13 +8,20 @@ export class ExchangeRateProvider {
         //oxr.set({ app_id: 'YOUR_APP_ID' })
     }
 
-    async getExchangeRate(currency1: string, currency2: string) {
-        
+    async convert(amount: Money, currency: string) {
+        let rate = await this.getExchangeRate(amount.currency, currency)
 
+        
+    }
+
+    async getExchangeRate(currency1: string, currency2: string): Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            resolve(1)
+        })
     }
 
 
-    private generateCacheKey(currency1: string, currency2: string) {
+    private generateCacheKey(currency1: string, currency2: string): string {
 
     }
 }
