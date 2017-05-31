@@ -1,5 +1,3 @@
-/// <reference path="../../types/js-money.d.ts" />
-
 import * as express from 'express'
 //import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 import CoreClient from '../core-client'

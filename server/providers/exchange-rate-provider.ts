@@ -1,5 +1,3 @@
-/// <reference path="../../types/js-money.d.ts" />
-
 import * as oxr from 'open-exchange-rates'
 import * as Money from 'js-money'
 
