@@ -1,6 +1,7 @@
 import * as express from 'express'
 import wallets from './wallets'
 import periodicPayments from './periodic-payments'
+import instances from './instances'
 //import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 
 
