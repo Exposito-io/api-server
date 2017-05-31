@@ -81,6 +81,7 @@
     "@types/mocha": "^2.2.41",
     "@types/mongodb": "^2.2.2",
     "@types/morgan": "1.7.32",
+    "@types/node": "^7.0.22",
     "@types/passport": "^0.3.3",
     "@types/read": "0.0.28",
     "@types/sjcl": "^1.0.28",

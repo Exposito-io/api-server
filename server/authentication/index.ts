@@ -1,5 +1,5 @@
 import * as passport from 'passport'
-import User from '../../models/user'
+import { User } from 'models'
 
 
 function login(req, res){
