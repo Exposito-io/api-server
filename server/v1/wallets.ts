@@ -1,3 +1,5 @@
+/// <reference path="../../types/js-money.d.ts" />
+
 import * as express from 'express'
 //import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 import CoreClient from '../core-client'
@@ -6,11 +8,15 @@ import * as config from 'config'
 import { WalletProvider } from '../providers/wallet-provider'
 import { PeriodicPaymentProvider } from '../providers/periodic-payment-provider'
 import { FixedPayment, FixedPaymentOptions } from 'models'
+import * as Money from 'js-money'
 
 const walletProvider = new WalletProvider()
 const paymentProvider = new PeriodicPaymentProvider()
 
 const router = express.Router()
+
+let m = Money.fromInteger(1, 'USD')
+
 
 router.get('/', async (req, res) => {
     try {

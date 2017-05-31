@@ -1,8 +1,7 @@
-//// <reference path="../../types/js-money.d.ts" />
+/// <reference path="../../types/js-money.d.ts" />
 
 import * as oxr from 'open-exchange-rates'
 import * as Money from 'js-money'
-
 
 
 
@@ -14,7 +13,8 @@ export class ExchangeRateProvider {
 
     async convert(amount: Money, currency: string) {
         let rate = await this.getExchangeRate(amount.currency, currency)
-        
+        //amount.
+        //Money.
     }
 
     async getExchangeRate(currency1: string, currency2: string): Promise<number> {

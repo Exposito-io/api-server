@@ -16,6 +16,7 @@
             "*": ["*"]
         },
         "typeRoots": [
+            "types"
         ],
         "types": ["chai", "mocha"]
     },
