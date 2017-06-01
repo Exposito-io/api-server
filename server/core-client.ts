@@ -124,7 +124,7 @@ class Utils {
       });
     };
 
-    static async getClient(walletId?: string|ObjectID) {
+    static async getClient(walletId?: string|ObjectID): Promise<any> {
 
         let client = new Client({
             baseUrl: url.resolve(<string>config.get('coreWalletServiceHost'), '/bws/api')

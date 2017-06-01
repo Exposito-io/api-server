@@ -147,12 +147,13 @@ router.post('/:id/send', async (req, res) => {
         let client = await CoreClient.getClient(req.params.id)
         let amount = CoreClient.parseAmount(req.body.amount)
         let feePerKb = !_.isUndefined(req.body.fee) ? CoreClient.parseAmount(req.body.fee) : 100e2
-        let address = req.body.address
+        let destination = req.body.destination
+        let destinationType = req.body.destinationType
         let note = req.body.note || ''
 
         let txp = await client.createTxProposal({
             outputs: [{
-                toAddress: address,
+                toAddress: destination,
                 amount: amount,
             }],
             message: note,
