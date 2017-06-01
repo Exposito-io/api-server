@@ -112,7 +112,7 @@ router.get('/:id/balance', async (req, res) => {
 })
 
 
-
+/*
 router.post('/:id/fixed-payment', async (req, res) => {
     try {
         await paymentProvider.createFixedPeriodicPayment({
@@ -126,7 +126,7 @@ router.post('/:id/fixed-payment', async (req, res) => {
     } catch (e) {
         res.json({ error: e })
     }
-})
+})*/
 
 
 router.post('/:id/address', async (req, res) => {

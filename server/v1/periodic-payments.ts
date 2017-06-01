@@ -40,7 +40,8 @@ router.post('/fixed', async (req, res) => {
     try {
         let periodicPayment = await paymentProvider.createFixedPeriodicPayment({
             sourceWalletId: req.body.sourceWalletId,
-            destinationWalletId: req.body.destinationWalletId,
+            destination: req.body.destination,
+            destinationType: req.body.destinationType,
             amount: req.body.amount,
             currency: req.body.currency,
             schedule: req.body.schedule
