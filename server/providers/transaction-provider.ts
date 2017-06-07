@@ -5,7 +5,7 @@ import { BitcoinWallet, PeriodicPayment, Wallet, CreatePaymentRequest, PaymentDe
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
 import { ExchangeRateProvider } from 'currency-converter'
-import * as Money from 'js-money'
+import { Money } from 'ts-money'
 
 
 
@@ -14,7 +14,7 @@ export class TransactiontProvider {
     protected currencyConverter: ExchangeRateProvider
 
     constructor() {
-        this.currencyConverter = new ExchangeRateProvider()        
+        this.currencyConverter = new ExchangeRateProvider()
     }
 
     /**
