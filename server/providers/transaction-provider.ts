@@ -36,6 +36,10 @@ export class TransactiontProvider {
                     bitcointDestinationAddress: request.destination,
                     amount: satoshiAmount.amount
                 })
+
+            case PaymentDestination.WALLET: 
+                return 
+
         } 
         
 
