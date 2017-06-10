@@ -1,20 +1,29 @@
 import { ObjectID } from 'mongodb'
 import * as config from 'config'
 import * as dbFactory from 'mongo-factory'
-import { BitcoinWallet, PeriodicPayment, Wallet, CreatePaymentRequest, PaymentDestination } from 'models'
+import { BitcoinWallet, PeriodicPayment, Wallet, CreatePaymentRequest, PaymentDestination, WalletType, ExpositoError, ErrorCode } from 'models'
+import { WalletProvider } from './wallet-provider'
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
 import { ExchangeRateProvider } from 'currency-converter'
-import { Money } from 'ts-money'
+import { Money, Currencies } from 'models'
 
 
 
 export class TransactiontProvider {
 
+    protected createFunctions = [
+        {from: WalletType.BITCOIN, to: PaymentDestination.BITCOIN_ADDRESS, fn: this.createBitcoinPayment},
+        {from: WalletType.BITCOIN, to: PaymentDestination.WALLET, fn: this.createBitcoinPayment}
+    ]
+
     protected currencyConverter: ExchangeRateProvider
+    protected walletProvider: WalletProvider
+
 
     constructor() {
         this.currencyConverter = new ExchangeRateProvider()
+        this.walletProvider = new WalletProvider()
     }
 
     /**
@@ -24,6 +33,18 @@ export class TransactiontProvider {
      */
     async createPayment(request: CreatePaymentRequest): Promise<string> {
 
+        let wallet = await this.walletProvider.fetchById(request.sourceWalletId)
+        // TODO: Lock wallet
+
+        let fn = this.createFunctions.find(p => p.from === wallet.getType() && p.to === request.destinationType).fn as Function
+
+        if (!fn)
+            throw new ExpositoError(ErrorCode.UNKNOWN_PAYMENT_REQUEST)
+
+        await fn()
+
+        // TODO: unlock
+        /*
         let amount = Money.fromDecimal(request.amount, request.currency)
 
         switch(request.destinationType) {
@@ -40,24 +61,28 @@ export class TransactiontProvider {
             case PaymentDestination.WALLET: 
                 return 
 
-        } 
-        
+        }*/
 
     }
 
 
-    async createBitcoinPayment(request: CreateBitcoinPaymentOptions): Promise<string> {
+
+    async createBitcoinPayment(request: CreatePaymentRequest/*CreateBitcoinPaymentOptions*/): Promise<string> {
+        // TODO: Validate request as bitcoin
+
         let client = await CoreClient.getClient(request.sourceWalletId)
-        let amount = CoreClient.parseAmount(request.amount)
-        let feePerKb = !_.isUndefined(request.fee) ? CoreClient.parseAmount(request.fee) : 100e2
-        let destination = request.bitcointDestinationAddress
+        let amount = Money.fromStringDecimal(request.amount, request.currency)
+
+        let amountSat = await this.currencyConverter.convert(amount, 'satoshi')
+        let feePerKb = (await this.getFees()).amount
+        let destination = request.destination
 
         let note = request.note || ''
 
         let txp = await client.createTxProposal({
             outputs: [{
                 toAddress: destination,
-                amount: amount,
+                amount: amountSat,
             }],
             message: note,
             feePerKb: feePerKb,
@@ -90,7 +115,12 @@ export class TransactiontProvider {
 
     async createWalletPayment(request: CreatePaymentRequest): Promise<string> {
         return ''
-    }   
+    }
+
+
+    async getFees(): Promise<Money> {
+        return Money.fromInteger(100e2)
+    }
 
 
 }
