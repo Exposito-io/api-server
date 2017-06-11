@@ -2,6 +2,7 @@ import { ObjectID } from 'mongodb'
 import * as config from 'config'
 import * as dbFactory from 'mongo-factory'
 import { BitcoinWallet, PeriodicPayment, Wallet } from 'models'
+import CoreClient from '../core-client'
 
 
 class WalletProvider {
@@ -51,16 +52,24 @@ class WalletProvider {
 
             if (result.insertedId)
                 return await this.fetchById(result.insertedId)
-                
+
         } catch(e) {
             // TODO mcormier: Handle error
             throw(e)
-        }        
+        }
     }
 
+    async getBitcoinPublicAddress(walletId: string|ObjectID) {
+
+        let wallet = await this.fetchById(walletId) as BitcoinWallet
+        let client = await CoreClient.getClient(wallet.getCoreWallet())
+        return await client.createAddress({})
+
+    }
 
     async attachPeriodicPayment(payment: PeriodicPayment, wallet: Wallet) {
-        
+        // TODO: Return last created address if it was never used
+
 
     }
 

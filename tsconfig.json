@@ -12,6 +12,7 @@
         "inlineSources": true,
         "allowJs": true,
         "baseUrl": ".",
+        "lib": ["es2017"],
         "paths": {
             "*": ["*"]
         },

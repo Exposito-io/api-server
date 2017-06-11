@@ -8,7 +8,7 @@ import FileStorage from './filestorage'
 import * as sjcl from 'sjcl'
 import { WalletProvider } from './providers/wallet-provider'
 //import { BitcoinCoreWallet } from "../models/core/bitcoin-core-wallet";
-import { Wallet, CryptoCurrency, BitcoinWallet } from 'models'
+import { Wallet, WalletType, BitcoinWallet } from 'models'
 import * as config from 'config'
 import { ObjectID } from 'mongodb'
 
@@ -135,7 +135,7 @@ class Utils {
         }
         else {
           let wallet = await walletProvider.fetchById(walletId)
-          if (wallet.getType() === CryptoCurrency.BITCOIN) {
+          if (wallet.getType() === WalletType.BITCOIN) {
             let bitcoinWallet = wallet as BitcoinWallet
             let coreWallet = JSON.stringify(bitcoinWallet.getCoreWallet())
             return await Utils.doLoad2(client, false, coreWallet, null)

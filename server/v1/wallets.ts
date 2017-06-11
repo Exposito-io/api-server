@@ -5,11 +5,12 @@ import * as _ from 'lodash'
 import * as config from 'config'
 import { WalletProvider } from '../providers/wallet-provider'
 import { PeriodicPaymentProvider } from '../providers/periodic-payment-provider'
-import { FixedPayment, FixedPaymentOptions } from 'models'
-import * as Money from 'js-money'
+import { TransactiontProvider } from '../providers/transaction-provider'
+import { Money, FixedPayment, FixedPaymentOptions } from 'models'
 
 const walletProvider = new WalletProvider()
 const paymentProvider = new PeriodicPaymentProvider()
+const transactionProvider = new TransactiontProvider()
 
 const router = express.Router()
 
@@ -143,6 +144,24 @@ router.post('/:id/address', async (req, res) => {
 
 
 router.post('/:id/send', async (req, res) => {
+    try {
+        let result = await transactionProvider.createPayment({
+            sourceWalletId: req.params.id,
+            destination: req.body.destination,
+            destinationType: req.body.destinationType,
+            amount: req.body.amount,
+            currency: req.body.currency,
+            note: req.body.note
+        })
+
+        res.json({ res: result })
+    } catch(e) {
+        res.json({ error: e })
+    }
+
+})
+
+router.post('/:id/xsend', async (req, res) => {
     try {
         let client = await CoreClient.getClient(req.params.id)
         let amount = CoreClient.parseAmount(req.body.amount)

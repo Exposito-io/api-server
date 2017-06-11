@@ -14,7 +14,7 @@ export class TransactiontProvider {
 
     protected createFunctions = [
         {from: WalletType.BITCOIN, to: PaymentDestination.BITCOIN_ADDRESS, fn: this.createBitcoinPayment},
-        {from: WalletType.BITCOIN, to: PaymentDestination.WALLET, fn: this.createBitcoinPayment}
+        {from: WalletType.BITCOIN, to: PaymentDestination.WALLET, fn: this.createBitcoinToWalletPayment}
     ]
 
     protected currencyConverter: ExchangeRateProvider
@@ -33,35 +33,24 @@ export class TransactiontProvider {
      */
     async createPayment(request: CreatePaymentRequest): Promise<string> {
 
+        if (!CreatePaymentRequest.validate(request))
+            throw(new ExpositoError(ErrorCode.INVALID_CREATE_PAYMENT_REQUEST))
+
         let wallet = await this.walletProvider.fetchById(request.sourceWalletId)
         // TODO: Lock wallet
 
-        let fn = this.createFunctions.find(p => p.from === wallet.getType() && p.to === request.destinationType).fn as Function
+        let fnConfig = this.createFunctions.find(p => p.from === wallet.getType() && p.to === request.destinationType)
 
-        if (!fn)
+        if (!fnConfig)
             throw new ExpositoError(ErrorCode.UNKNOWN_PAYMENT_REQUEST)
 
-        await fn()
+        let fn = fnConfig.fn.bind(this) as Function
+
+        let result = await fn(request)
 
         // TODO: unlock
-        /*
-        let amount = Money.fromDecimal(request.amount, request.currency)
 
-        switch(request.destinationType) {
-            case PaymentDestination.BITCOIN_ADDRESS: 
-                let satoshiAmount = await this.currencyConverter.convert(amount, 'satoshi')
-
-                return this.createBitcoinPayment({
-                    sourceWalletId: request.sourceWalletId,
-                    //bitcointDestinationAddress: request.destination,
-                    bitcointDestinationAddress: request.destination,
-                    amount: satoshiAmount.amount
-                })
-
-            case PaymentDestination.WALLET: 
-                return 
-
-        }*/
+        return result
 
     }
 
@@ -82,7 +71,7 @@ export class TransactiontProvider {
         let txp = await client.createTxProposal({
             outputs: [{
                 toAddress: destination,
-                amount: amountSat,
+                amount: amountSat.amount,
             }],
             message: note,
             feePerKb: feePerKb,
@@ -113,16 +102,22 @@ export class TransactiontProvider {
     }
 
 
-    async createWalletPayment(request: CreatePaymentRequest): Promise<string> {
-        return ''
+    async createBitcoinToWalletPayment(request: CreatePaymentRequest): Promise<string> {
+        let bitcoinAddress = await this.walletProvider.getBitcoinPublicAddress(request.destination)
+
+        let bitcoinRequest = Object.assign({}, request)
+        request.destination = bitcoinAddress
+        request.destinationType = PaymentDestination.BITCOIN_ADDRESS
+
+        return this.createBitcoinPayment(bitcoinRequest)
     }
 
 
     async getFees(): Promise<Money> {
-        return Money.fromInteger(100e2)
+        return Money.fromInteger(100e2, 'satoshi')
     }
 
-
+ 
 }
 
 
