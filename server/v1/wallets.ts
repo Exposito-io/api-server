@@ -161,51 +161,6 @@ router.post('/:id/send', async (req, res) => {
 
 })
 
-router.post('/:id/xsend', async (req, res) => {
-    try {
-        let client = await CoreClient.getClient(req.params.id)
-        let amount = CoreClient.parseAmount(req.body.amount)
-        let feePerKb = !_.isUndefined(req.body.fee) ? CoreClient.parseAmount(req.body.fee) : 100e2
-        let destination = req.body.destination
-        let destinationType = req.body.destinationType
-        let note = req.body.note || ''
-
-        let txp = await client.createTxProposal({
-            outputs: [{
-                toAddress: destination,
-                amount: amount,
-            }],
-            message: note,
-            feePerKb: feePerKb,
-        })
-
-        await client.publishTxProposal({ txp: txp })
-
-        //res.json({ tid: CoreClient.shortID(txp.id) })
-        let txpid = CoreClient.shortID(txp.id)
-
-        let txps = await client.getTxProposals({})
-
-        let txp1 = CoreClient.findOneTxProposal(txps, txpid)
-
-        let tx = await client.signTxProposal(txp1)
-
-        console.log('Transaction signed by you.')
-
-        let txp2 = await client.broadcastTxProposal(txp1)
-
-        console.log('Transaction Broadcasted: TXID: ' + txp2.txid)
-        res.json({ success: true, txid: txp2.txid })
-
-        /*
-        console.log(' * Tx created: ID %s [%s] RequiredSignatures:',
-            CoreClient.shortID(txp.id), txp.status, txp.requiredSignatures);*/
-
-    } catch (e) {
-        res.json({ error: e})
-    }
-})
-
 
 
 
