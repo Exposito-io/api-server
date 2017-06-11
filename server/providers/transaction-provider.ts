@@ -106,8 +106,8 @@ export class TransactiontProvider {
         let bitcoinAddress = await this.walletProvider.getBitcoinPublicAddress(request.destination)
 
         let bitcoinRequest = Object.assign({}, request)
-        request.destination = bitcoinAddress
-        request.destinationType = PaymentDestination.BITCOIN_ADDRESS
+        bitcoinRequest.destination = bitcoinAddress
+        bitcoinRequest.destinationType = PaymentDestination.BITCOIN_ADDRESS
 
         return this.createBitcoinPayment(bitcoinRequest)
     }

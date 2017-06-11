@@ -62,8 +62,13 @@ class WalletProvider {
     async getBitcoinPublicAddress(walletId: string|ObjectID) {
 
         let wallet = await this.fetchById(walletId) as BitcoinWallet
-        let client = await CoreClient.getClient(wallet.getCoreWallet())
-        return await client.createAddress({})
+        let client = await CoreClient.getClient(walletId)
+        let result = await client.createAddress({})
+
+        if (!result.address)
+            throw('')
+
+        return result.address
 
     }
 
