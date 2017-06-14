@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
             sourceWalletId: req.body.sourceWalletId,
 
             destination: req.body.destination,
-            destinationType: req.body.destinationType,
+            destinationType: new Number(req.body.destinationType).valueOf(),
 
             amount: req.body.amount,
             currency: req.body.currency,
@@ -55,7 +55,7 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         let periodicPayment = await paymentProvider.fetchById(req.params.id)
-
+        
         res.json(periodicPayment)
 
     } catch(e) {
