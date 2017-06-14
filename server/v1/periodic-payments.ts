@@ -23,6 +23,33 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.post('/', async (req, res) => {
+    try {
+        let periodicPayment = await paymentProvider.createPeriodicPayment({
+            schedule: req.body.schedule,
+            sourceWalletId: req.body.sourceWalletId,
+
+            destination: req.body.destination,
+            destinationType: req.body.destinationType,
+
+            amount: req.body.amount,
+            currency: req.body.currency,
+
+            amountFunction: req.body.amountFunction,
+            amountFunctionFile: req.body.amountFunctionFile,
+
+            payments: req.body.payments,
+
+            isPaused: req.body.isPaused
+        })
+
+        res.json(periodicPayment)
+
+    } catch(e) {
+        res.json({ error: e })
+    }
+})
+
 
 
 router.get('/:id', async (req, res) => {
