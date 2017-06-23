@@ -11,11 +11,21 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
     try {
-        let stats = await githubStatsProvider.getRepoStats({
-            owner: req.query.owner,
-            repo: req.query.repo
-        })
-        res.json(stats)
+        if (req.query.owner && req.query.repo) {
+            let stats = await githubStatsProvider.getRepoStats({
+                owner: req.query.owner,
+                repo: req.query.repo
+            })
+            return res.json(stats)
+        }
+        else if (req.query.repos) {
+            // TODO: validate repos
+            let repos = JSON.parse(req.query.repos)
+            let stats = await githubStatsProvider.getMultipleRepoStats(repos)
+            return res.json(stats)           
+        }
+        else
+            throw('Invalid params')
     } catch(e) {
         res.json({ error: e})
     }
