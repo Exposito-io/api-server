@@ -1,7 +1,7 @@
 import { ObjectID, Collection } from 'mongodb'
 import * as config from 'config'
 import * as dbFactory from 'mongo-factory'
-import { BitcoinWallet, PeriodicPayment, PeriodicPaymentOptions, FixedPayment, FixedPaymentOptions, Wallet, RepoParams } from 'models'
+import { BitcoinWallet, PeriodicPayment, PeriodicPaymentOptions, FixedPayment, FixedPaymentOptions, Wallet, RepoParams, RepoAuthor, RepoStats } from 'models'
 import { WalletProvider } from './wallet-provider'
 import * as BigNumber from 'bignumber.js'
 
@@ -44,24 +44,11 @@ export class GithubStatsProvider {
             totalFileCount: stats.totalFileCount.toString()
         }
     }
-    
+
 }
 
 
-export class RepoStats {
-    authors: RepoAuthor[]
-    totalLinesOfCode: string
-    totalFileCount: string
-}
 
-
-export class RepoAuthor {
-    name: string
-    email: string
-    linesOfCode: string
-    fileCount: string
-    availablePaymentMethods: any[]
-}
 
 
 
