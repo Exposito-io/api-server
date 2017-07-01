@@ -1,9 +1,9 @@
 /// <reference path="../../types/undefined.d.ts" />
 
 import { ObjectID } from 'mongodb'
-import * as config from 'config'
+import config from '../../config'
 import * as dbFactory from 'mongo-factory'
-import User from '../../models/user'
+import { User } from 'models'
 
 
 /**
@@ -24,7 +24,7 @@ class UserProvider {
      */
     async updateGoogleProfile(googleProfile): Promise<User> {
 
-        let db = await dbFactory.getConnection(config.get('database'))
+        let db = await dbFactory.getConnection(config.database)
         let users = await db.collection('users').find({ 'googleProfile.id': googleProfile.id }).limit(1).toArray()
 
         if (users.length === 0) {
@@ -49,7 +49,7 @@ class UserProvider {
         if (!(id instanceof ObjectID))
             id = new ObjectID(id);
 
-        let db = await dbFactory.getConnection(config.get('database'))
+        let db = await dbFactory.getConnection(config.database)
         let users = await db.collection('users').find({ _id: id }).limit(1).toArray()
 
         if (users.length === 0)
@@ -67,7 +67,7 @@ class UserProvider {
      */
     findByOauthId(oauthId) {
         return new Promise((resolve, reject) => {
-            dbFactory.getConnection(config.get('database'))
+            dbFactory.getConnection(config.database)
             .then(db => db.collection('users').find({ 'googleProfile.id': oauthId }).limit(1).toArray())
             .then(users => {
                 if (users.length === 0)
@@ -83,14 +83,14 @@ class UserProvider {
     private _createUserFromGoogleProfile(googleProfile) {
         //googleProfile = this._extractOauthInfo(googleProfile);
 
-        return dbFactory.getConnection(config.get('database'))
+        return dbFactory.getConnection(config.database)
                .then(db => db.collection('users').insertOne({googleProfile}))
     }
 
     private _updateGoogleProfile(_id, googleProfile) {
         //googleProfile = this._extractOauthInfo(googleProfile);
 
-        return dbFactory.getConnection(config.get('database'))
+        return dbFactory.getConnection(config.database)
                .then(db => db.collection('users').updateOne({ _id }, { $set: {googleProfile} }))
     }
 

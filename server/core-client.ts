@@ -9,7 +9,7 @@ import * as sjcl from 'sjcl'
 import { WalletProvider } from './providers/wallet-provider'
 //import { BitcoinCoreWallet } from "../models/core/bitcoin-core-wallet";
 import { Wallet, WalletType, BitcoinWallet } from 'models'
-import * as config from 'config'
+import config from '../config'
 import { ObjectID } from 'mongodb'
 
 var WALLET_ENCRYPTION_OPTS = {
@@ -127,7 +127,7 @@ class Utils {
     static async getClient(walletId?: string|ObjectID): Promise<any> {
 
         let client = new Client({
-            baseUrl: url.resolve(<string>config.get('coreWalletServiceHost'), '/bws/api')
+            baseUrl: url.resolve(config.coreWalletServiceHost, '/bws/api')
         })
 
         if (walletId == null) {

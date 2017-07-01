@@ -1,5 +1,5 @@
 import { ObjectID } from 'mongodb'
-import * as config from 'config'
+import config from '../../config'
 import * as dbFactory from 'mongo-factory'
 import { BitcoinWallet, PeriodicPayment, Wallet } from 'models'
 import CoreClient from '../core-client'
@@ -16,7 +16,7 @@ class WalletProvider {
         if (!(id instanceof ObjectID))
             id = new ObjectID(id);
 
-        let db = await dbFactory.getConnection(config.get('database'))
+        let db = await dbFactory.getConnection(config.database)
         let wallets = await db.collection('wallets').find({ _id: id }).limit(1).toArray()
 
         if (wallets.length === 0)
@@ -31,7 +31,7 @@ class WalletProvider {
     async fetchWalletsForClients(clientIds: (string|ObjectID)[]): Promise<Wallet[]> {
         try {
             let clientObjectIds = clientIds.map( clientId => typeof clientId === 'string' ? new ObjectID(clientId) : clientId )
-            let db = await dbFactory.getConnection(config.get('database'))
+            let db = await dbFactory.getConnection(config.database)
             let wallets = await db.collection('wallets').find({}).toArray()
 
             return wallets.map(wallet => Wallet.fromJSON(wallet))
@@ -47,7 +47,7 @@ class WalletProvider {
             throw('Invalid wallet')
 
         try {
-            let db = await dbFactory.getConnection(config.get('database'))
+            let db = await dbFactory.getConnection(config.database)
             let result = await db.collection('wallets').insertOne(wallet.toJSON())
 
             if (result.insertedId)

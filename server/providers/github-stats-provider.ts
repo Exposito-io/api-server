@@ -1,5 +1,5 @@
 import { ObjectID, Collection } from 'mongodb'
-import * as config from 'config'
+import config from '../../config'
 import * as dbFactory from 'mongo-factory'
 import { BitcoinWallet, PeriodicPayment, PeriodicPaymentOptions, FixedPayment, FixedPaymentOptions, Wallet, RepoParams, RepoAuthor, RepoStats } from 'models'
 import { WalletProvider } from './wallet-provider'
@@ -16,7 +16,7 @@ export class GithubStatsProvider {
 
 
     async getRepoStats(params: RepoParams): Promise<RepoStats> {
-        let db = await dbFactory.getConnection(config.get('database'))
+        let db = await dbFactory.getConnection(config.database)
         let col = db.collection('repo-stats') as Collection
 
         let stats = await col.findOne(params)
@@ -25,7 +25,7 @@ export class GithubStatsProvider {
     }
 
     async getMultipleRepoStats(repos: RepoParams[]): Promise<RepoStats> {
-        let db = await dbFactory.getConnection(config.get('database'))
+        let db = await dbFactory.getConnection(config.database)
         let col = db.collection('repo-stats') as Collection
 
         let stats = (await col.find({ $or: repos })

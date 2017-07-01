@@ -2,9 +2,7 @@ import * as express from 'express'
 //import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
-import * as config from 'config'
-import { WalletProvider } from '../providers/wallet-provider'
-import { PeriodicPaymentProvider } from '../providers/periodic-payment-provider'
+import { WalletProvider, PeriodicPaymentProvider } from '../providers'
 import { FixedPayment } from 'models'
 
 const walletProvider = new WalletProvider()

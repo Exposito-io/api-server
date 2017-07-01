@@ -1,5 +1,5 @@
 import { ObjectID } from 'mongodb'
-import * as config from 'config'
+import config from '../../config'
 import * as dbFactory from 'mongo-factory'
 import { BitcoinWallet, PeriodicPayment, Wallet, CreatePaymentRequest, PaymentDestination, WalletType, ExpositoError, ErrorCode } from 'models'
 import { WalletProvider } from './wallet-provider'

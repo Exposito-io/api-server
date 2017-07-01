@@ -4,7 +4,7 @@
 import * as app from '../app'
 import * as http from 'http'
 import * as debug from 'debug'
-import * as config from 'config'
+import  config from '../config'
 
 // binding to console
 let log = debug('modern-express:server')
@@ -13,7 +13,7 @@ log.log = console.log.bind(console)
 /**
  * Get port from environment and store in Express.
  */
-let PORT = config.get('serverPort') || '3000'
+let PORT = config.serverPort
 
 function getPort(val) {
     /**

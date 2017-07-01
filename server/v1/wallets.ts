@@ -2,7 +2,7 @@ import * as express from 'express'
 //import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
-import * as config from 'config'
+import config from '../../config'
 import { WalletProvider } from '../providers/wallet-provider'
 import { PeriodicPaymentProvider } from '../providers/periodic-payment-provider'
 import { TransactiontProvider } from '../providers/transaction-provider'
@@ -44,18 +44,18 @@ router.post('/', async (req, res) => {
         let client = await CoreClient.getClient()
 
         client.seedFromRandomWithMnemonic({
-            network: config.get("bitcoinNetwork"),
+            network: config.bitcoinNetwork,
             passphrase: undefined,
             language: 'en',
         })
 
         let secret = await client.createWallet(walletName, 'copayer1', 1, 1, {
-            network: config.get("bitcoinNetwork")
+            network: config.bitcoinNetwork
         })
 
 
-        console.log(' * ' + _.capitalize(config.get('bitcoinNetwork') as string) + ' Wallet Created.')
-        await CoreClient.saveClient({ host: config.get('coreWalletServiceHost'), file: 'C:\\weblog\\.wallet.dat' }, client)
+        console.log(' * ' + _.capitalize(config.bitcoinNetwork) + ' Wallet Created.')
+        await CoreClient.saveClient({ host: config.coreWalletServiceHost, file: 'C:\\weblog\\.wallet.dat' }, client)
 
         if (secret)
             console.log('   - Secret to share:\n\t' + secret)

@@ -1,5 +1,5 @@
 import * as express from 'express'
-import * as config from 'config'
+import config from '../../config'
 import { GithubStatsProvider } from '../providers/github-stats-provider'
 import { TokenProvider } from '../providers/token-provider'
 import * as auth from '../authentication'

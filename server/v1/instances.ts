@@ -2,7 +2,7 @@ import * as express from 'express'
 //import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 
 import * as _ from 'lodash'
-import * as config from 'config'
+import config from '../../config'
 import {  } from 'models'
 import * as gcloudCompute from '@google-cloud/compute'
 

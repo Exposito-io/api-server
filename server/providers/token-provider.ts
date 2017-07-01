@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken'
-import * as config from 'config'
+import config from '../../config'
 let secrets = require(`../../../secrets/${process.env.NODE_ENV || 'default'}.json`)
 
 const TOKEN_TTL = '365d' // expires in 365 days

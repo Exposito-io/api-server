@@ -2,7 +2,7 @@ import * as express from 'express'
 //import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
-import * as config from 'config'
+import config from '../../config'
 import { GithubStatsProvider } from '../providers/github-stats-provider'
 
 const githubStatsProvider = new GithubStatsProvider()

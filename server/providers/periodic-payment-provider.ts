@@ -1,5 +1,5 @@
 import { ObjectID, Collection } from 'mongodb'
-import * as config from 'config'
+import config from '../../config'
 import * as dbFactory from 'mongo-factory'
 import { BitcoinWallet, PeriodicPayment, PeriodicPaymentOptions, FixedPayment, FixedPaymentOptions, Wallet } from 'models'
 import { WalletProvider } from './wallet-provider'
@@ -22,7 +22,7 @@ class PeriodicPaymentProvider {
         if (!(id instanceof ObjectID))
             id = new ObjectID(id);
 
-        let db = await dbFactory.getConnection(config.get('database'))
+        let db = await dbFactory.getConnection(config.database)
         let periodicPayments = await db.collection('periodic-payments').find({ _id: id }).limit(1).toArray()
 
         if (periodicPayments.length === 0)
@@ -38,7 +38,7 @@ class PeriodicPaymentProvider {
     async fetchPeriodicPayments(clientIds: string[]) {
 
         let clientObjectIds = clientIds.map( clientId => new ObjectID(clientId) )
-        let db = await dbFactory.getConnection(config.get('database'))
+        let db = await dbFactory.getConnection(config.database)
         let periodicPayments = await db.collection('periodic-payments')
                                         .find({ 
                                             
@@ -55,7 +55,7 @@ class PeriodicPaymentProvider {
         
         let periodicPayment = new PeriodicPayment(options)
 
-        let db = await dbFactory.getConnection(config.get('database'))
+        let db = await dbFactory.getConnection(config.database)
 
         let insertResult = await db.collection('periodic-payments').insertOne(periodicPayment)
 
@@ -81,7 +81,7 @@ class PeriodicPaymentProvider {
         // TODO: Validate sourceWalletId and destinationWalletId
         
         let periodicPayment = FixedPayment.fromOptions(paymentOpts)
-        let db = await dbFactory.getConnection(config.get('database'))
+        let db = await dbFactory.getConnection(config.database)
 
         let insertResult = await db.collection('periodic-payments').insertOne(periodicPayment)
 
