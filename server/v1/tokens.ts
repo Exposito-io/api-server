@@ -9,7 +9,7 @@ const tokentProvider = new TokenProvider()
 
 const router = express.Router()
 
-router.get('/', auth.hasAccess, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         let token = await tokentProvider.generateToken({ userId: req.user.id })
         return res.json({ token: token })

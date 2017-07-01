@@ -33,13 +33,16 @@ class PeriodicPaymentProvider {
     }
 
 
-    async fetchPeriodicPaymentForClient(clientId: string|ObjectID) { return this.fetchPeriodicPaymentForClients([clientId]) }
+    //async fetchPeriodicPayments(clientId: string|ObjectID) { return this.fetchPeriodicPayments([clientId]) }
 
-    async fetchPeriodicPaymentForClients(clientIds: (string|ObjectID)[]) {
+    async fetchPeriodicPayments(clientIds: string[]) {
 
-        let clientObjectIds = clientIds.map( clientId => typeof clientId === 'string' ? new ObjectID(clientId) : clientId )
+        let clientObjectIds = clientIds.map( clientId => new ObjectID(clientId) )
         let db = await dbFactory.getConnection(config.get('database'))
-        let periodicPayments = await db.collection('periodic-payments').find({ }).toArray()
+        let periodicPayments = await db.collection('periodic-payments')
+                                        .find({ 
+                                            
+         }).toArray()
 
         return periodicPayments.map(periodicPayment => PeriodicPayment.fromJSON(periodicPayment))
 

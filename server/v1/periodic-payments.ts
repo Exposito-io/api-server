@@ -14,7 +14,7 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
     try {
-        let periodicPayments = await paymentProvider.fetchPeriodicPaymentForClients([])
+        let periodicPayments = await paymentProvider.fetchPeriodicPayments([ req.user.id ])
         res.json({
             periodicPayments
         })
