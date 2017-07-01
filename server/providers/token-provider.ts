@@ -1,6 +1,6 @@
-let jwt = require('jsonwebtoken')
-let config = require('config')
-let secrets = require(`../secrets/${process.env.NODE_ENV || 'default'}`)
+import * as jwt from 'jsonwebtoken'
+import * as config from 'config'
+let secrets = require(`../../../secrets/${process.env.NODE_ENV || 'default'}.json`)
 
 const TOKEN_TTL = '365d' // expires in 365 days
 
@@ -8,7 +8,7 @@ const TOKEN_TTL = '365d' // expires in 365 days
  * Provides tools to manipulate authentication tokens
  *
  */
-class TokenProvider {
+export class TokenProvider {
 
     constructor() {
     }
@@ -29,7 +29,7 @@ class TokenProvider {
      * @param  {string} token
      * @return {Object}
      */
-    getTokenInfo(token) {
+    getTokenInfo(token: string): Promise<{ isValid: boolean, userId?: string }> {
         return new Promise((resolve, reject) => {
             jwt.verify(token, secrets.tokens, (err, decoded) => {
                 if (err) {
@@ -50,4 +50,4 @@ class TokenProvider {
 }
 
 
-module.exports = TokenProvider
+

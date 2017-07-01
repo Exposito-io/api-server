@@ -9,7 +9,7 @@ import * as cookieParser from 'cookie-parser'
 import * as homepage from './server/homepage'
 import * as v1 from './server/v1'
 
-import * as authentication from './server/authentication'
+import * as auth from './server/authentication'
 import * as session from 'express-session'
 import * as connectRedis from 'connect-redis'
 import {Strategy as GoogleStrategy} from 'passport-google-oauth2'
@@ -50,7 +50,7 @@ app.use(session({
 
 // Initialize Passport and restore authentication state, if any, from the
 // session.
-authentication.initialize(app)
+auth.initialize(app)
 
 
 
@@ -62,7 +62,7 @@ app.use('/v1', v1)
 
 
 app.get('/profile',
-  require('connect-ensure-login').ensureLoggedIn(),
+  auth.hasAccess,
   function(req, res){
     res.render('profile', { user: req.user })
   })
