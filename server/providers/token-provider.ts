@@ -17,7 +17,7 @@ export class TokenProvider {
      * Generates a token
      *
      */
-    generateToken(data) {
+    generateToken(data: { userId: string }) {
       return jwt.sign(data, secrets.tokens, {
           expiresIn: TOKEN_TTL
       })
