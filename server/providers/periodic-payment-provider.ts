@@ -1,7 +1,7 @@
 import { ObjectID, Collection } from 'mongodb'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
-import { BitcoinWallet, PeriodicPayment, PeriodicPaymentOptions, FixedPayment, FixedPaymentOptions, Wallet } from 'models'
+import { BitcoinWallet, PeriodicPayment, PeriodicPaymentOptions, FixedPayment, FixedPaymentOptions, Wallet, GetPeriodicPaymentFilters } from 'models'
 import { WalletProvider } from './wallet-provider'
 
 
@@ -35,14 +35,14 @@ class PeriodicPaymentProvider {
 
     //async fetchPeriodicPayments(clientId: string|ObjectID) { return this.fetchPeriodicPayments([clientId]) }
 
-    async fetchPeriodicPayments(clientIds: string[]) {
+    async getPeriodicPayments(filters: GetPeriodicPaymentFilters) {
 
-        let clientObjectIds = clientIds.map( clientId => new ObjectID(clientId) )
         let db = await dbFactory.getConnection(config.database)
         let periodicPayments = await db.collection('periodic-payments')
-                                        .find({ 
-                                            
-         }).toArray()
+                                        .find({
+                                            organizationId: new ObjectID(filters.organizationId)
+                                        })
+                                        .toArray()
 
         return periodicPayments.map(periodicPayment => PeriodicPayment.fromJSON(periodicPayment))
 

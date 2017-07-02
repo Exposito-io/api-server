@@ -2,17 +2,23 @@ import * as express from 'express'
 //import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
-import { WalletProvider, PeriodicPaymentProvider } from '../providers'
+import { WalletProvider, PeriodicPaymentProvider, UserProvider } from '../providers'
 import { FixedPayment } from 'models'
 
 const walletProvider = new WalletProvider()
 const paymentProvider = new PeriodicPaymentProvider()
+const userProvider = new UserProvider()
 
 const router = express.Router()
 
 router.get('/', async (req, res) => {
     try {
-        let periodicPayments = await paymentProvider.fetchPeriodicPayments([ req.user.id ])
+        if (!(await userProvider.validateUsersBelongToOrganization(req.query.organizationId, [req.user.id])))
+            throw "User doesn't belong to organization"
+
+        let periodicPayments = await paymentProvider.getPeriodicPayments({
+            organizationId: req.query.organizationId
+        })
         res.json({
             periodicPayments
         })
@@ -25,6 +31,7 @@ router.post('/', async (req, res) => {
     try {
         let periodicPayment = await paymentProvider.createPeriodicPayment({
             schedule: req.body.schedule,
+            organizationId: req.body.organizationId,
             sourceWalletId: req.body.sourceWalletId,
 
             destination: req.body.destination,
@@ -53,7 +60,7 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         let periodicPayment = await paymentProvider.fetchById(req.params.id)
-        
+
         res.json(periodicPayment)
 
     } catch(e) {

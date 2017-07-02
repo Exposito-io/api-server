@@ -1,16 +1,18 @@
 /// <reference path="../../types/undefined.d.ts" />
 
-import { ObjectID } from 'mongodb'
+import { ObjectID, Collection } from 'mongodb'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
 import { User } from 'models'
+import { OrganizationProvider } from './organization-provider'
 
+const orgProvider = new OrganizationProvider()
 
 /**
  * User provider
  *
  */
-class UserProvider {
+export class UserProvider {
 
     constructor() {
 
@@ -71,12 +73,25 @@ class UserProvider {
             .then(db => db.collection('users').find({ 'googleProfile.id': oauthId }).limit(1).toArray())
             .then(users => {
                 if (users.length === 0)
-                    throw("No user found");
+                    throw("No user found")
                 else
                     resolve(users[0])
             })
-            .catch(err => reject(err));
-        });
+            .catch(err => reject(err))
+        })
+    }
+
+    /**
+     * Validates that users belong to
+     * an organization
+     * 
+     * @param organizationId 
+     * @param userIds 
+     */
+    async validateUsersBelongToOrganization(organizationId: string, userIds: string[]) {
+        let org = await orgProvider.getOrganizationById(organizationId)
+
+        return userIds.every(userId => org.members.some(member => member.userId === userId))
     }
 
 
@@ -113,4 +128,3 @@ class UserProvider {
 
 
 
-export default UserProvider
