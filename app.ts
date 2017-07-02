@@ -7,7 +7,7 @@ import * as bodyParser from 'body-parser'
 import * as root from 'app-root-path'
 import * as cookieParser from 'cookie-parser'
 import * as homepage from './server/homepage'
-import * as v1 from './server/v1'
+import * as v0 from './server/v0'
 
 import * as auth from './server/authentication'
 import * as session from 'express-session'
@@ -57,7 +57,7 @@ auth.initialize(app)
 
 
 app.get('/', homepage.controller)
-app.use('/v1', v1)
+app.use('/v0', v0)
 
 
 

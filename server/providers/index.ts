@@ -1,4 +1,5 @@
 export * from './github-stats-provider'
+export * from './organization-provider'
 export * from './periodic-payment-provider'
 export * from './token-provider'
 export * from './transaction-provider'

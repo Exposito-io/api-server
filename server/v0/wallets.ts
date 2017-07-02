@@ -14,13 +14,12 @@ const transactionProvider = new TransactiontProvider()
 
 const router = express.Router()
 
-let m = Money.fromInteger(1, 'USD')
 
 
 router.get('/', async (req, res) => {
     try {
         let wallets = await walletProvider.fetchWalletsForClients([])
-        res.json({ 
+        res.json({
             wallets: wallets.map(wallet => { 
                 return {
                     id: wallet.getId(), 

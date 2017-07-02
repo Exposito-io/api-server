@@ -16,7 +16,7 @@ export class OrganizationProvider {
 
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('organizations') as Collection
-        let results = await col.insert(organization)
+        let results = await col.insertOne(organization)
 
         if (results.insertedCount === 1) {
             organization.id = results.insertedId.toHexString()
@@ -31,7 +31,7 @@ export class OrganizationProvider {
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('organizations') as Collection
 
-        let organizations = await col.find({ 'members.id': userId }).toArray()
+        let organizations = await col.find({ 'members.userId': userId }).toArray()
 
         return organizations.map(org => Organization.fromJSON(org))
     }
