@@ -27,8 +27,12 @@ router.get('/', async (req, res) => {
     }
 })
 
+
 router.post('/', async (req, res) => {
     try {
+        if (!(await userProvider.validateUsersBelongToOrganization(req.body.organizationId, [req.user.id])))
+            throw "User doesn't belong to organization"
+
         let periodicPayment = await paymentProvider.createPeriodicPayment({
             schedule: req.body.schedule,
             organizationId: req.body.organizationId,
@@ -61,6 +65,9 @@ router.get('/:id', async (req, res) => {
     try {
         let periodicPayment = await paymentProvider.fetchById(req.params.id)
 
+        if (!(await userProvider.validateUsersBelongToOrganization(periodicPayment.organizationId, [req.user.id])))
+            throw 'Invalid'
+            
         res.json(periodicPayment)
 
     } catch(e) {
@@ -68,6 +75,7 @@ router.get('/:id', async (req, res) => {
     }
 })
 
+/*
 router.post('/fixed', async (req, res) => {
     try {
         let periodicPayment = await paymentProvider.createFixedPeriodicPayment({
@@ -84,7 +92,7 @@ router.post('/fixed', async (req, res) => {
     } catch(e) {
         res.json({ error: e })
     }
-})
+})*/
 
 
 export default router

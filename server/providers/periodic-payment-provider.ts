@@ -52,13 +52,13 @@ class PeriodicPaymentProvider {
     async createPeriodicPayment(options: PeriodicPaymentOptions): Promise<PeriodicPayment> {
 
         // TODO: Validate wallet
-        
+
         let periodicPayment = new PeriodicPayment(options)
 
         let db = await dbFactory.getConnection(config.database)
 
         let insertResult = await db.collection('periodic-payments').insertOne(periodicPayment)
-
+   
         if (insertResult.insertedCount === 1) {
             let updateResult = await db.collection('wallets')
                                  .updateOne({ _id: periodicPayment.sourceWalletId },
@@ -66,9 +66,9 @@ class PeriodicPaymentProvider {
 
             if (updateResult.modifiedCount !== 1)
                 throw('Error updating Wallet')
-            
+
             return this.fetchById(insertResult.insertedId)
-                
+
         }
         else {
             throw('Problem inserting PeriodicPayment')
