@@ -6,11 +6,13 @@ import config from '../../config'
 import { WalletProvider } from '../providers/wallet-provider'
 import { PeriodicPaymentProvider } from '../providers/periodic-payment-provider'
 import { TransactiontProvider } from '../providers/transaction-provider'
+import { UserProvider } from '../providers/user-provider'
 import { Money, FixedPayment, FixedPaymentOptions } from 'models'
 
 const walletProvider = new WalletProvider()
 const paymentProvider = new PeriodicPaymentProvider()
 const transactionProvider = new TransactiontProvider()
+const userProvider = new UserProvider()
 
 const router = express.Router()
 
@@ -33,6 +35,28 @@ router.get('/', async (req, res) => {
     }
 })
 
+
+router.post('/', async (req, res) => {
+    try {
+        if (!(await userProvider.validateUsersBelongToOrganization(req.body.organizationId, [req.user.id])))
+            throw "User doesn't belong to organization"        
+
+        let wallet = await walletProvider.createBitcoinWallet({
+            name: req.body.name,
+            organizationId: req.body.organizationId,
+            labels: []
+        })
+
+
+        res.json(wallet)
+
+
+    } catch(e) {
+        res.json({ error: e })
+    }
+})
+
+/*
 router.post('/', async (req, res) => {
     try {
         if (!validateWalletName(req.body.name))
@@ -67,7 +91,7 @@ router.post('/', async (req, res) => {
         res.json({ error: e })
     }
 })
-
+*/
 
 router.get('/:id', async (req, res) => {
     try {

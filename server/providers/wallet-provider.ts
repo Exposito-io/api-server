@@ -1,8 +1,9 @@
-import { ObjectID } from 'mongodb'
+import { ObjectID, Collection } from 'mongodb'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
-import { BitcoinWallet, PeriodicPayment, Wallet } from 'models'
+import { BitcoinWallet, PeriodicPayment, Wallet, BitcoinWalletOptions } from 'models'
 import CoreClient from '../core-client'
+import * as _ from 'lodash'
 
 
 class WalletProvider {
@@ -40,7 +41,43 @@ class WalletProvider {
         }
     }
 
+    async createBitcoinWallet(params: BitcoinWalletOptions): Promise<BitcoinWallet> {
 
+        let db = await dbFactory.getConnection(config.database)
+        let col = await db.collection('wallets') as Collection
+
+        let wallet = BitcoinWallet.fromParams(params)
+
+
+        let client = await CoreClient.getClient()
+
+        client.seedFromRandomWithMnemonic({
+            network: config.bitcoinNetwork,
+            passphrase: undefined,
+            language: 'en',
+        })
+
+        let secret = await client.createWallet(wallet.name, 'copayer1', 1, 1, {
+            network: config.bitcoinNetwork
+        })
+
+
+        console.log(' * ' + _.capitalize(config.bitcoinNetwork) + ' Wallet Created.')
+
+
+        let str = client.export()
+        wallet.coreWallet = JSON.parse(str)
+
+        let result = await col.insertOne(wallet)
+   
+        
+        if (result.insertedCount === 1) {
+            wallet.id = result.insertedId.toHexString()
+            return wallet
+        }
+        else
+            throw 'Error creating wallet'
+    }
 
     async createWallet(wallet: BitcoinWallet): Promise<Wallet> {
         if (!wallet.isValid()) 
