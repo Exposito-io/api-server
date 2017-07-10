@@ -11,7 +11,8 @@ const router = express.Router()
 
 const gce = gcloudCompute({
   projectId: 'quantal-152414',
-  keyFilename: '/path/to/keyfile.json'
+  keyFilename: '/home/mathew/workspace/Exposito/secrets/google-compute.json',
+  promise: Promise
 })
 
 
@@ -30,14 +31,22 @@ router.post('/', async (req, res) => {
         var zone = gce.zone(req.body.zone)
         var name = req.body.name
 
-        zone.createVM(req.body.name)
-        .then(function(data) {
+        zone.createVM(req.body.name, { 
+            machineType: 'f1-micro',
+            os: 'ubuntu'
+            //resource: { }
+        })
+        .then(data => {
             var vm = data[0]
             var operation = data[1]
             
             //return operation.promise()
             return res.json(vm)
-        }) /*
+        })
+        .catch(err => {
+            res.json({ error: err })
+        })
+         /*
         .then(function() {
             // Virtual machine created! 
         })   */     

@@ -12,6 +12,7 @@ import * as auth from '../authentication'
 const router = express.Router()
 
 router.get('/', (req, res) => res.json({}))
+router.use('/instances', auth.hasAccess, instances)
 router.use('/periodic-payments', auth.hasAccess, periodicPayments)
 router.use('/organizations', auth.hasAccess, organizations)
 router.use('/repo-stats', auth.hasAccess, repoStats)
