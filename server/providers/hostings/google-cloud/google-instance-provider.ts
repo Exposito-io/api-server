@@ -1,10 +1,11 @@
 import { InstanceProvider } from '../../instance-provider'
 import { GoogleInstance, CreateGoogleInstanceParams } from 'models'
 import * as gcloudCompute from '@google-cloud/compute'
+import config from '../../../../config'
 
 const gce = gcloudCompute({
   projectId: 'quantal-152414',
-  keyFilename: '/home/mathew/workspace/Exposito/secrets/google-compute.json',
+  keyFilename: `${config.secretsPath}/google-compute.json`,
   promise: Promise
 })
 
