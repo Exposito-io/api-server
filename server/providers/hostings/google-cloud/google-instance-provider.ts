@@ -19,7 +19,18 @@ export class GoogleInstanceProvider extends InstanceProvider {
 
         let data = await zone.createVM(params.name, { 
             machineType: 'f1-micro',
-            os: 'ubuntu'
+            //os: 'ubuntu'
+            disks: [{
+                    initializeParams: {
+                        sourceImage: "projects/debian-cloud/global/images/debian-8-jessie-v20170619"
+                    },
+                    boot: true
+            }],
+            networkInterfaces: [
+                {
+                    network: "global/networks/default"
+                }
+            ]
             //resource: { }
         })
 
