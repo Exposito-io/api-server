@@ -22,6 +22,4 @@ export abstract class InstanceProvider {
     }
 
 
-
-
 }
