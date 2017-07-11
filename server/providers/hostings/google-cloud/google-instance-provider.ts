@@ -17,6 +17,7 @@ export class GoogleInstanceProvider extends InstanceProvider {
  
         var zone = gce.zone(instance.zone)
 
+        // TODO: Add organizationId to vm name on google compute
         let data = await zone.createVM(params.name, { 
             machineType: instance.machineType,
             //os: 'ubuntu'
