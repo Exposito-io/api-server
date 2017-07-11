@@ -33,6 +33,7 @@ router.post('/', async (req, res) => {
 
         let instance = await instanceProvider.createInstance({
             name: req.body.name,
+            description: req.body.description,
             zone: req.body.zone,
             machineType: req.body.machineType,
             organizationId: req.body.organizationId,
