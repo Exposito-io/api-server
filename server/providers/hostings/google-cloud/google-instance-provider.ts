@@ -1,5 +1,5 @@
 import { InstanceProvider } from '../../instance-provider'
-import { GoogleInstance, CreateGoogleInstanceParams } from 'models'
+import { Instance,GoogleInstance, CreateGoogleInstanceParams } from 'models'
 import * as gcloudCompute from '@google-cloud/compute'
 import config from '../../../../config'
 
@@ -13,12 +13,12 @@ export class GoogleInstanceProvider extends InstanceProvider {
 
     async createInstance(params: CreateGoogleInstanceParams): Promise<GoogleInstance> {
 
-        let instance = GoogleInstance.fromParams(params)
-
-        var zone = gce.zone('us-central1-c')
+        let instance = Instance.fromParams(params)
+ 
+        var zone = gce.zone(instance.zone)
 
         let data = await zone.createVM(params.name, { 
-            machineType: 'f1-micro',
+            machineType: instance.machineType,
             //os: 'ubuntu'
             disks: [{
                     initializeParams: {
@@ -38,7 +38,6 @@ export class GoogleInstanceProvider extends InstanceProvider {
                     ]                    
                 }
             ]
-            //resource: { }
         })
 
         var vm = data[0]
