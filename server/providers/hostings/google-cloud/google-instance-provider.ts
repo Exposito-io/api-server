@@ -24,11 +24,18 @@ export class GoogleInstanceProvider extends InstanceProvider {
                     initializeParams: {
                         sourceImage: "projects/debian-cloud/global/images/debian-8-jessie-v20170619"
                     },
-                    boot: true
+                    boot: true,
+                    autoDelete: true
             }],
             networkInterfaces: [
                 {
-                    network: "global/networks/default"
+                    network: "global/networks/default",
+                    accessConfigs: [
+                        {
+                        "name": "External NAT",
+                        "type": "ONE_TO_ONE_NAT"
+                        }
+                    ]                    
                 }
             ]
             //resource: { }
