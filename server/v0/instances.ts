@@ -5,8 +5,9 @@ import * as _ from 'lodash'
 import config from '../../config'
 import {  } from 'models'
 import * as gcloudCompute from '@google-cloud/compute'
+import { GoogleInstanceProvider } from '../providers/hostings/google-cloud/google-instance-provider'
 
-
+const instanceProvider = new GoogleInstanceProvider()
 const router = express.Router()
 
 const gce = gcloudCompute({
@@ -29,6 +30,26 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         var zone = gce.zone(req.body.zone)
+
+        let instance = await instanceProvider.createInstance({
+            name: req.body.name,
+            organizationId: req.body.organizationId,
+            hostingType: req.body.hostingType,
+            labels: req.body.labels
+        })
+
+        res.json(instance)
+
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
+
+/*
+router.post('/', async (req, res) => {
+    try {
+        var zone = gce.zone(req.body.zone)
         var name = req.body.name
 
         zone.createVM(req.body.name, { 
@@ -46,13 +67,14 @@ router.post('/', async (req, res) => {
         .catch(err => {
             res.json({ error: err })
         })
-         /*
         .then(function() {
             // Virtual machine created! 
-        })   */     
+        })   
     } catch(e) {
         res.json({ error: e})
     }
 })
+*/
+
 
 export default router
