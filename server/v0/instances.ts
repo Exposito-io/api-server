@@ -4,24 +4,16 @@ import * as express from 'express'
 import * as _ from 'lodash'
 import config from '../../config'
 import {  } from 'models'
-import * as gcloudCompute from '@google-cloud/compute'
 import { GoogleInstanceProvider } from '../providers/hostings/google-cloud/google-instance-provider'
 
 const instanceProvider = new GoogleInstanceProvider()
 const router = express.Router()
 
-const gce = gcloudCompute({
-  projectId: 'quantal-152414',
-  keyFilename: '/home/mathew/workspace/Exposito/secrets/google-compute.json',
-  promise: Promise
-})
-
 
 
 router.get('/', async (req, res) => {
     try {
-        var zone = gce.zone('us-central1-a')
-        var name = 'ubuntu-http'
+
     } catch(e) {
         res.json({ error: e})
     }
@@ -29,12 +21,12 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        var zone = gce.zone(req.body.zone)
 
         let instance = await instanceProvider.createInstance({
             name: req.body.name,
             description: req.body.description,
             zone: req.body.zone,
+            disks: req.body.disks,
             machineType: req.body.machineType,
             organizationId: req.body.organizationId,
             hostingType: req.body.hostingType,

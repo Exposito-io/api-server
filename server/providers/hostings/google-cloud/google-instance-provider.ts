@@ -2,6 +2,8 @@ import { InstanceProvider } from '../../instance-provider'
 import { Instance,GoogleInstance, CreateGoogleInstanceParams } from 'models'
 import * as gcloudCompute from '@google-cloud/compute'
 import config from '../../../../config'
+import * as dbFactory from 'mongo-factory'
+import { ObjectID, Collection } from 'mongodb'
 
 const gce = gcloudCompute({
   projectId: 'quantal-152414',
@@ -15,19 +17,12 @@ export class GoogleInstanceProvider extends InstanceProvider {
 
         let instance = Instance.fromParams(params)
  
-        var zone = gce.zone(instance.zone)
+        let zone = gce.zone(instance.zone)
 
         // TODO: Add organizationId to vm name on google compute
         let data = await zone.createVM(params.name, { 
             machineType: instance.machineType,
-            //os: 'ubuntu'
-            disks: [{
-                    initializeParams: {
-                        sourceImage: "projects/debian-cloud/global/images/debian-8-jessie-v20170619"
-                    },
-                    boot: true,
-                    autoDelete: true
-            }],
+            disks: params.disks,
             networkInterfaces: [
                 {
                     network: "global/networks/default",
@@ -41,9 +36,16 @@ export class GoogleInstanceProvider extends InstanceProvider {
             ]
         })
 
+
+
         var vm = data[0]
         var operation = data[1]
 
+
+        let db = await dbFactory.getConnection(config.database)
+        let col = db.collection('instances') as Collection
+
+        await col.insertOne(instance)
 
         return instance
 
