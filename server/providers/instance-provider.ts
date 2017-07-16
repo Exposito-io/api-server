@@ -8,7 +8,7 @@ import * as _ from 'lodash'
 
 export abstract class InstanceProvider {
 
-
+    /*
     async getById(id: string): Promise<Instance> {
         // TODO validate id
         let db = await dbFactory.getConnection(config.database)
@@ -19,7 +19,7 @@ export abstract class InstanceProvider {
             throw("No user found")
         else
             return Instance.fromJSON(wallets[0])        
-    }
+    }*/
 
 
 }

@@ -13,7 +13,9 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
     try {
+        let instance = await instanceProvider.getById(req.query.id)
 
+        res.json(instance)
     } catch(e) {
         res.json({ error: e})
     }
