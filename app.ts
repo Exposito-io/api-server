@@ -14,10 +14,12 @@ import * as session from 'express-session'
 import * as connectRedis from 'connect-redis'
 import {Strategy as GoogleStrategy} from 'passport-google-oauth2'
 
-
+import * as cors from 'cors'
 
 
 const app = express()
+
+
 
 // view engine setup
 app.set('views', `${root}/server/views/`)
@@ -52,8 +54,8 @@ app.use(session({
 // session.
 auth.initialize(app)
 
-
-
+ 
+app.use(cors())
 
 
 app.get('/', homepage.controller)
