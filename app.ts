@@ -13,7 +13,7 @@ import * as auth from './server/authentication'
 import * as session from 'express-session'
 import * as connectRedis from 'connect-redis'
 import {Strategy as GoogleStrategy} from 'passport-google-oauth2'
-
+import config from './config'
 import * as cors from 'cors'
 
 
@@ -54,8 +54,10 @@ app.use(session({
 // session.
 auth.initialize(app)
 
- 
-app.use(cors())
+app.use(cors({
+  origin: config.corsOrigin,
+  credentials: true
+}))
 
 
 app.get('/', homepage.controller)
