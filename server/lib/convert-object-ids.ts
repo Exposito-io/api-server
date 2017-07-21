@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { ObjectID } from 'mongodb'
 
-export function convertStringsToObjectIds(obj: any, maxLevel: number = 50): void {
+export function convertStringsToObjectIds(obj: any, maxLevel: number = 50): any {
     for(let key in obj) {
         if (obj[key] instanceof Object)
             convertStringsToObjectIds(obj[key])
@@ -10,10 +10,12 @@ export function convertStringsToObjectIds(obj: any, maxLevel: number = 50): void
                 obj[key] = new ObjectID(obj[key])
         }
     }
+
+    return obj
 }
 
 
-export function convertObjectIdsToStrings(obj: any, maxLevel: number = 50): void {
+export function convertObjectIdsToStrings(obj: any, maxLevel: number = 50): any {
     for(let key in obj) {
         if (obj[key] instanceof Object)
             convertStringsToObjectIds(obj[key])
@@ -22,4 +24,6 @@ export function convertObjectIdsToStrings(obj: any, maxLevel: number = 50): void
                 obj[key] = obj[key].toHexString()
         }
     }
+
+    return obj
 }

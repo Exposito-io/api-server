@@ -3,6 +3,7 @@ import config from '../../config'
 import * as dbFactory from 'mongo-factory'
 import { BitcoinWallet, PeriodicPayment, PeriodicPaymentOptions, FixedPayment, FixedPaymentOptions, Wallet, GetPeriodicPaymentFilters } from 'models'
 import { WalletProvider } from './wallet-provider'
+import { convertObjectIdsToStrings, convertStringsToObjectIds } from '../lib/convert-object-ids'
 
 
 class PeriodicPaymentProvider {
@@ -20,15 +21,15 @@ class PeriodicPaymentProvider {
      */
     async fetchById(id: string|ObjectID): Promise<PeriodicPayment> {
         if (!(id instanceof ObjectID))
-            id = new ObjectID(id);
+            id = new ObjectID(id)
 
         let db = await dbFactory.getConnection(config.database)
-        let periodicPayments = await db.collection('periodic-payments').find({ _id: id }).limit(1).toArray()
+        let periodicPayment = await db.collection('periodic-payments').findOne({ _id: id })
 
-        if (periodicPayments.length === 0)
+        if (periodicPayment == null)
             throw('No periodic payment found')
-        else
-            return PeriodicPayment.fromJSON(periodicPayments[0])
+        else 
+            return convertObjectIdsToStrings(PeriodicPayment.fromJSON(periodicPayment))
 
     }
 
