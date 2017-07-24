@@ -8,6 +8,7 @@
         "noImplicitAny": false,
         "removeComments": true,
         "moduleResolution": "node",
+        "experimentalDecorators": true,
         "sourceMap": true,
         "inlineSources": true,
         "allowJs": true,
@@ -19,10 +20,11 @@
         "typeRoots": [
             "types"
         ],
-        "types": ["chai", "mocha"]
+        "types": ["node", "chai", "mocha"]
     },
     "include": [
-        "bin/www.ts"
+        "bin/www.ts",
+        "test"
     ],
     "exclude": [
         "node_modules"
