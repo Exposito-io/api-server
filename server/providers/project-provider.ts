@@ -48,7 +48,7 @@ export class ProjectProvider {
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('projects') as Collection
 
-        let projects = await col.find({ 'members.userId': userId }).toArray()
+        let projects = await col.find({ 'members.userId': new ObjectID(userId) }).toArray()
 
         return projects.map(org => Organization.fromJSON(org))
     }

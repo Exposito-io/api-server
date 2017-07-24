@@ -18,6 +18,17 @@ router.get('/', async (req, res) => {
 })
 
 
+router.get('/:id', async (req, res) => {
+    try {
+        let project = await projectProvider.getProjectById(req.params.id)
+        res.json(project)
+
+    } catch(e) {
+        res.json({ error: e })
+    }
+})
+
+
 router.post('/', async (req, res) => {
     try {
 
