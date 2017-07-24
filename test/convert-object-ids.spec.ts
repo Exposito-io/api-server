@@ -92,6 +92,7 @@ describe('convertStringsToObjectIds', () => {
         t.nested[0] = new MemberClass()
         t.nested[0].isObjectId = '5964f48c13ff364ca47598db'
         t.nested[0].isNotObjectId = '5964f48c13ff364ca47598db'
+        
         t.nested[1] = new MemberClass()
         t.nested[1].isObjectId = '5964f48c13ff364ca47598db'
         t.nested[1].isNotObjectId = '5964f48c13ff364ca47598db'        
