@@ -1,5 +1,5 @@
 import * as chai from 'chai'
-import { ObjectId } from 'models'
+import { BitcoinWallet, ObjectId } from 'models'
 import { ObjectID as MongoObjectId } from 'mongodb'
 import 'reflect-metadata'
 import { convertObjectIdsToStrings, convertStringsToObjectIds } from '../server/lib/convert-object-ids'
@@ -10,8 +10,8 @@ describe('convertStringsToObjectIds', () => {
     beforeEach(() => {
         
     })
-
-    it('adds ObjectId metadata to the right properties', () => {
+    
+    it('converts the right members', () => {
         class SimpleTest {
             
             @ObjectId
@@ -29,5 +29,41 @@ describe('convertStringsToObjectIds', () => {
         chai.expect(converted.isObjectId).to.be.an.instanceOf(MongoObjectId)
         chai.expect(converted.isNotObjectId).not.to.be.an.instanceOf(MongoObjectId)
     })
+
+
+    it('converts nested members', () => {
+        class TestClass {
+            
+            @ObjectId
+            isObjectId: string
+
+            isNotObjectId: string
+
+            nested: MemberClass
+        }
+
+        class MemberClass {
+            @ObjectId
+            isObjectId: string
+
+            isNotObjectId: string           
+        }
+
+        let t = new TestClass()
+        t.isObjectId = '5964f48c13ff364ca47598db'
+        t.isNotObjectId = '5964f48c13ff364ca47598db'
+        t.nested = new MemberClass()
+        t.nested.isObjectId = '5964f48c13ff364ca47598db'
+        t.nested.isNotObjectId = '5964f48c13ff364ca47598db'
+
+        let converted = convertStringsToObjectIds(t)
+
+        chai.expect(converted.isObjectId).to.be.an.instanceOf(MongoObjectId)
+        chai.expect(converted.isNotObjectId).not.to.be.an.instanceOf(MongoObjectId)
+
+        chai.expect(converted.nested.isObjectId).to.be.an.instanceOf(MongoObjectId)
+        chai.expect(converted.nested.isNotObjectId).not.to.be.an.instanceOf(MongoObjectId)        
+    })    
+
 
 })
