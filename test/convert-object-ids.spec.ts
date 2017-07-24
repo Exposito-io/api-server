@@ -66,4 +66,46 @@ describe('convertStringsToObjectIds', () => {
     })    
 
 
+    it('converts nested arrays', () => {
+        class TestClass {
+            
+            @ObjectId
+            isObjectId: string
+
+            isNotObjectId: string
+
+            nested: MemberClass[]
+        }
+
+        class MemberClass {
+            @ObjectId
+            isObjectId: string
+
+            isNotObjectId: string           
+        }
+
+        let t = new TestClass()
+        t.isObjectId = '5964f48c13ff364ca47598db'
+        t.isNotObjectId = '5964f48c13ff364ca47598db'
+
+        t.nested = []
+        t.nested[0] = new MemberClass()
+        t.nested[0].isObjectId = '5964f48c13ff364ca47598db'
+        t.nested[0].isNotObjectId = '5964f48c13ff364ca47598db'
+        t.nested[1] = new MemberClass()
+        t.nested[1].isObjectId = '5964f48c13ff364ca47598db'
+        t.nested[1].isNotObjectId = '5964f48c13ff364ca47598db'        
+
+        let converted = convertStringsToObjectIds(t)
+
+        chai.expect(converted.isObjectId).to.be.an.instanceOf(MongoObjectId)
+        chai.expect(converted.isNotObjectId).not.to.be.an.instanceOf(MongoObjectId)
+
+        chai.expect(converted.nested[0].isObjectId).to.be.an.instanceOf(MongoObjectId)
+        chai.expect(converted.nested[0].isNotObjectId).not.to.be.an.instanceOf(MongoObjectId)      
+        chai.expect(converted.nested[1].isObjectId).to.be.an.instanceOf(MongoObjectId)
+        chai.expect(converted.nested[1].isNotObjectId).not.to.be.an.instanceOf(MongoObjectId)             
+    })        
+
+
 })
