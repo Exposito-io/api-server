@@ -1,4 +1,4 @@
-import { Project, CreateProjectParams, ExpositoError, ErrorCode } from 'models'
+import { Project, CreateProjectParams, ProjectShareholdersDistribution, CreateProjectShareholdersDistributionParams, ExpositoError, ErrorCode } from 'models'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
 import { ObjectID, Collection } from 'mongodb'
@@ -9,7 +9,7 @@ export class ProjectProvider {
 
 
     constructor() {
-        
+
     }
 
 
@@ -28,12 +28,40 @@ export class ProjectProvider {
 
         if (results.insertedCount === 1) {
             project.id = results.insertedId.toHexString()
+
+            await this.createProjectShareholdersDistribution({
+                projectId: project.id,
+                shareholders: params.shareholders
+            })   
+
             return project
         }
         else
-            throw 'Error while creating organization'
+            throw 'Error while creating project'
 
     }
+
+
+    async createProjectShareholdersDistribution(params: CreateProjectShareholdersDistributionParams): Promise<ProjectShareholdersDistribution> {
+        // TODO: Validation
+
+        let projectShareholders = ProjectShareholdersDistribution.fromParams(params) as any
+
+        let db = await dbFactory.getConnection(config.database)
+        let col = db.collection('project-shareholders') as Collection
+
+        convertStringsToObjectIds(projectShareholders)
+
+        let results = await col.insertOne(projectShareholders)
+
+        if (results.insertedCount === 1) 
+            return convertObjectIdsToStrings(projectShareholders)        
+        else
+            throw 'Error while creating shareholders distribution'
+
+    }
+
+
 
     async getProjectById(projectId: string): Promise<Project> {
         let db = await dbFactory.getConnection(config.database)
