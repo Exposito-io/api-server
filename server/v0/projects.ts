@@ -1,7 +1,7 @@
 import * as express from 'express'
 import config from '../../config'
 import { ProjectProvider } from '../providers'
-import { CreateOrganizationParams } from 'models'
+import { CreateOrganizationParams, ShareholderDescription, InvitedShareholderDescription, GithubShareholdersDescription } from 'models'
 
 const projectProvider = new ProjectProvider()
 
@@ -38,7 +38,10 @@ router.post('/', async (req, res) => {
             members: [{
                 userId: req.user.id,
                 roles: []
-            }]
+            }],
+            shareholders: req.body.shareholders,
+            hosting: 1,
+            githubProjects: []
         })
 
         res.json(project)

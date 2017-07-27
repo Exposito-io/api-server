@@ -14,7 +14,7 @@ export class TransactiontProvider {
 
     protected createFunctions = [
         {from: WalletType.BITCOIN, to: PaymentDestination.BITCOIN_ADDRESS, fn: this.createBitcoinPayment},
-        {from: WalletType.BITCOIN, to: PaymentDestination.WALLET, fn: this.createBitcoinToWalletPayment}
+        {from: WalletType.BITCOIN, to: PaymentDestination.EXPOSITO_WALLET, fn: this.createBitcoinToWalletPayment}
     ]
 
     protected currencyConverter: ExchangeRateProvider
