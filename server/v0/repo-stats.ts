@@ -4,6 +4,9 @@ import CoreClient from '../core-client'
 import * as _ from 'lodash'
 import config from '../../config'
 import { GithubStatsProvider } from '../providers/github-stats-provider'
+import * as Queue from 'bull'
+
+let repoStatsQueue = new Queue('repo-stats', 'redis://127.0.0.1:6379')
 
 const githubStatsProvider = new GithubStatsProvider()
 
@@ -26,6 +29,18 @@ router.get('/', async (req, res) => {
         }
         else
             throw('Invalid params')
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
+
+router.get('/new', async (req, res) => {
+    try {
+        let job = await repoStatsQueue.add({ name: req.query.name })
+
+        res.json({ success: 1 }) 
+
     } catch(e) {
         res.json({ error: e})
     }
