@@ -31,17 +31,19 @@ function getPort(val) {
     return false;
 }
 
-app.set('port', PORT);
+app.set('port', PORT)
 
 /**
  * Create HTTP server.
  */
-const server = http.createServer(app);
+const server = http.createServer(app)
+
+app.io.attach(server)
 
 /**
  * Listen on provided port, on all network interfaces.
  */
-server.listen(PORT);
+server.listen(PORT)
 
 server.on('error', (error) => {
     /**

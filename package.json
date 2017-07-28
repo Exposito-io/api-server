@@ -67,6 +67,7 @@
     "reflect-metadata": "^0.1.10",
     "serialize-error": "2.0.0",
     "sjcl": "^1.0.6",
+    "socket.io": "^2.0.3",
     "uuid": "^3.0.1",
     "validate.js": "0.10.0",
     "winston": "2.2.0"
@@ -93,6 +94,7 @@
     "@types/read": "0.0.28",
     "@types/reflect-metadata": "0.0.5",
     "@types/sjcl": "^1.0.28",
+    "@types/socket.io": "^1.4.29",
     "@types/uuid": "^2.0.29",
     "@types/validator": "5.7.34",
     "@types/winston": "0.0.28",

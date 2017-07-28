@@ -6,22 +6,25 @@ import organizations from './organizations'
 import projects from './projects'
 import repoStats from './repo-stats'
 import tokens from './tokens'
+import jobs from './jobs'
 import * as auth from '../authentication'
 //import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 
 
-const router = express.Router()
+export default function v0(io) {
+    const router = express.Router()
 
-router.get('/', (req, res) => res.json({}))
-router.use('/instances', auth.hasAccess, instances)
-router.use('/periodic-payments', auth.hasAccess, periodicPayments)
-router.use('/projects', auth.hasAccess, projects)
-router.use('/organizations', auth.hasAccess, organizations)
-router.use('/repo-stats', auth.hasAccess, repoStats)
-router.use('/tokens', auth.hasAccess, tokens)
-router.use('/wallets', auth.hasAccess, wallets)
+    router.get('/', (req, res) => res.json({}))
+    router.use('/instances', auth.hasAccess, instances)
+    router.use('/jobs', auth.hasAccess, jobs(io))
+    router.use('/periodic-payments', auth.hasAccess, periodicPayments)
+    router.use('/projects', auth.hasAccess, projects)
+    router.use('/organizations', auth.hasAccess, organizations)
+    router.use('/repo-stats', auth.hasAccess, repoStats)
+    router.use('/tokens', auth.hasAccess, tokens)
+    router.use('/wallets', auth.hasAccess, wallets)
+
+    return router
+}
 
 
-
-
-export = router

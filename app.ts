@@ -7,7 +7,7 @@ import * as bodyParser from 'body-parser'
 import * as root from 'app-root-path'
 import * as cookieParser from 'cookie-parser'
 import * as homepage from './server/homepage'
-import * as v0 from './server/v0'
+import v0 from './server/v0'
 
 import * as auth from './server/authentication'
 import * as session from 'express-session'
@@ -15,10 +15,12 @@ import * as connectRedis from 'connect-redis'
 import {Strategy as GoogleStrategy} from 'passport-google-oauth2'
 import config from './config'
 import * as cors from 'cors'
+import * as socketio from 'socket.io'
 
 
-const app = express()
+const app = express() as any
 
+app.io = socketio()
 
 
 // view engine setup
@@ -61,7 +63,7 @@ app.use(cors({
 
 
 app.get('/', homepage.controller)
-app.use('/v0', v0)
+app.use('/v0', v0(app.io))
 
 
 
