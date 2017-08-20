@@ -14,8 +14,16 @@ export class GithubStatsProvider {
 
     }
 
-
-    async getRepoStats(params: RepoParams): Promise<RepoStats> {
+    /**
+     * Returns the statistics of a Github repository if the stats
+     * have already been compiled at least once. If they are requested 
+     * for the first time, the promise will return a job
+     * ID since the calculation of the stats may take an unknown amount of time
+     * to execute, depending on the size of the repository
+     * 
+     * @param params 
+     */
+    async getRepoStats(params: RepoParams): Promise<RepoStats | string> {
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('repo-stats') as Collection
 
