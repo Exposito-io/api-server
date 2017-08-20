@@ -20,7 +20,7 @@ function initialize(app) {
     })
 
     passport.deserializeUser(function(obj, cb) {
-      console.log(`deserializeUser: `, obj)
+      //console.log(`deserializeUser: `, obj)
       cb(null, obj);
     })
 
