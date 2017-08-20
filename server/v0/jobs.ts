@@ -43,46 +43,13 @@ export default function jobs(io) {
     router.get('/', async (req, res) => {
         try {
 
-            res.json({ success: 2 }) 
+            res.json({ success: 1 }) 
 
         } catch(e) {
             res.json({ error: e})
         }
     })
 
-
-    router.get('/new', async (req, res) => {
-        try {
-            let job = await repoStatsQueue.add({ owner: 'mathew', repo: req.query.name })
-            console.log('starting job')
-            /*
-            repoStatsQueue.on('completed', function(job, result){
-                console.log('Job completed!: ', job)
-            })  */          
-
-            res.json({ success: 2 }) 
-
-        } catch(e) {
-            res.json({ error: e})
-        }
-    })
-
-    router.get('/process', async (req, res) => {
-        try {
-
-            repoStatsQueue.process((job, done) => {
-                console.log('processing job: ')
-                console.log(job.data.name)
-                //job.progress(100)
-                done()
-            })      
-
-            res.json({ success: 2 }) 
-
-        } catch(e) {
-            res.json({ error: e})
-        }
-    })
 
     return router
 }
