@@ -16,8 +16,9 @@ export default function jobs(io) {
     })*/
 
     const router = express.Router()
+    let jobsIo = io.of('/jobs')
     
-    io.on('connection', function(client){
+    jobsIo.on('connection', function(client){
         client.on('subscribe', data => {
 
             console.log('Subscribe')
