@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
                 owner: req.query.owner,
                 repo: req.query.repo
             })
-            
+
             return res.json(results)
         }
         else if (req.query.repos) {
@@ -35,17 +35,6 @@ router.get('/', async (req, res) => {
     }
 })
 
-
-router.get('/new', async (req, res) => {
-    try {
-        let job = await repoStatsQueue.add({ name: req.query.name })
-
-        res.json({ success: 1 }) 
-
-    } catch(e) {
-        res.json({ error: e})
-    }
-})
 
 
 router.get('/:owner/:repo', async (req, res) => {
