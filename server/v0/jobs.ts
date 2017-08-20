@@ -7,6 +7,10 @@ import * as Queue from 'bull'
 
 let repoStatsQueue = new Queue('repo-stats', config.queueServer)
 
+let availableJobs = {
+    'repo-stats': new Queue('repo-stats', config.queueServer)
+}
+
 
 
 export default function jobs(io) {
@@ -18,9 +22,10 @@ export default function jobs(io) {
     const router = express.Router()
     let jobsIo = io.of('/jobs')
     
-    jobsIo.on('connection', function(client){
+    jobsIo.on('connection', function(client) {
         client.on('subscribe', data => {
 
+            
             console.log('Subscribe')
             repoStatsQueue.on('global:completed', (job, result) => {
                 console.log('job complete: ', job)
