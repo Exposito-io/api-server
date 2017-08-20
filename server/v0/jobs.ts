@@ -53,7 +53,7 @@ export default function jobs(io) {
 
     router.get('/new', async (req, res) => {
         try {
-            let job = await repoStatsQueue.add({ name: req.query.name })
+            let job = await repoStatsQueue.add({ owner: 'mathew', repo: req.query.name })
             console.log('starting job')
             /*
             repoStatsQueue.on('completed', function(job, result){

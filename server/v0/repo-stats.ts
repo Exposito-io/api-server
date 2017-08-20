@@ -15,11 +15,12 @@ const router = express.Router()
 router.get('/', async (req, res) => {
     try {
         if (req.query.owner && req.query.repo) {
-            let stats = await githubStatsProvider.getRepoStats({
+            let results = await githubStatsProvider.getRepoStats({
                 owner: req.query.owner,
                 repo: req.query.repo
             })
-            return res.json(stats)
+            
+            return res.json(results)
         }
         else if (req.query.repos) {
             // TODO: validate repos

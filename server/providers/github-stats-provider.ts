@@ -51,6 +51,7 @@ export class GithubStatsProvider {
      * one or more of them have never been calculated, an error
      * will be thrown. But a job will be started for each 
      * missing repo stats.
+     * 
      * @param repos 
      */
     async getMultipleRepoStats(repos: RepoParams[]): Promise<RepoStats> {
@@ -60,6 +61,8 @@ export class GithubStatsProvider {
         let stats = (await col.find({ $or: repos })
                              .toArray())
                              .map(this.convertMongoRepoStats)
+
+        // TODO: Check if all the stats are available
 
         let authors = _(stats)
                         .flatMap(author => author.authors)
