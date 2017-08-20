@@ -5,6 +5,9 @@ import { BitcoinWallet, PeriodicPayment, PeriodicPaymentOptions, FixedPayment, F
 import { WalletProvider } from './wallet-provider'
 import * as BigNumber from 'bignumber.js'
 import * as _ from 'lodash'
+import * as Queue from 'bull'
+
+let repoStatsQueue = new Queue('repo-stats', config.queueServer)
 
 
 export class GithubStatsProvider {
@@ -14,24 +17,42 @@ export class GithubStatsProvider {
 
     }
 
+
     /**
      * Returns the statistics of a Github repository if the stats
      * have already been compiled at least once. If they are requested 
-     * for the first time, the promise will return a job
-     * ID since the calculation of the stats may take an unknown amount of time
+     * for the first time, the promise will return a job object
+     * since the calculation of the stats may take an unknown amount of time
      * to execute, depending on the size of the repository
      * 
      * @param params 
      */
-    async getRepoStats(params: RepoParams): Promise<RepoStats | string> {
+    async getRepoStats(params: RepoParams): Promise<RepoStats | Queue.Job> {
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('repo-stats') as Collection
 
         let stats = await col.findOne(params)
 
-        return this.convertMongoRepoStats(stats)
+        if (stats != null)
+            return this.convertMongoRepoStats(stats)
+        else {
+            // TODO: test if a job already exists
+            let job = await repoStatsQueue.add({ 
+                owner: params.owner, 
+                repo: params.repo 
+            })
+
+            return job
+        }
     }
 
+    /**
+     * Returns stats for multiple Github repositories. If 
+     * one or more of them have never been calculated, an error
+     * will be thrown. But a job will be started for each 
+     * missing repo stats.
+     * @param repos 
+     */
     async getMultipleRepoStats(repos: RepoParams[]): Promise<RepoStats> {
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('repo-stats') as Collection
