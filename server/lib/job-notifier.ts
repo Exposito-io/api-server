@@ -29,14 +29,13 @@ export class JobNotifier {
     }
 
 
-    // TODO: Don't use reference comparison
     private removeClient(client) {
         for (let queue of this.clients.keys()) {
 
             let queueClients = this.clients.get(queue)
 
             for (let c of queueClients) {
-                if (c.client === c) {
+                if (client.id === c.client.id) {
                     console.log('client removed successfully')
                     availableJobQueues[queue].off('global:completed', c.listener)
                     queueClients.splice(queueClients.indexOf(c), 1)
@@ -54,15 +53,15 @@ export class JobNotifier {
         }        
 
         this.io.on('connection', client => {
-            client.jobCompleteListeners = []
 
             client.on('subscribe', data => {                
 
                 if (availableQueueNames.includes(data.queue)) {
-                    console.log(`Subscribing to ${data.queue}`)
+                    
                     let queueClients = this.clients.get(data.queue)
 
-                    if (!queueClients.some( c => c.client === client )) {
+                    if (!queueClients.some( c => c.client.id === client.id )) {
+                        console.log(`Subscribing to ${data.queue}`)
                         let listener = this.generateQueueCompleteListener(client, data.queue)
                         queueClients.push({ client, listener })
 
