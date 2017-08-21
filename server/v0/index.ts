@@ -1,6 +1,7 @@
 import * as express from 'express'
 import wallets from './wallets'
 import periodicPayments from './periodic-payments'
+import github from './github'
 import instances from './instances'
 import organizations from './organizations'
 import projects from './projects'
@@ -16,6 +17,7 @@ export default function v0(io) {
     const router = express.Router()
 
     router.get('/', (req, res) => res.json({}))
+    router.use('/github', auth.hasAccess, github)
     router.use('/instances', auth.hasAccess, instances)
     router.use('/jobs', auth.hasAccess, jobs(io))
     router.use('/periodic-payments', auth.hasAccess, periodicPayments)
