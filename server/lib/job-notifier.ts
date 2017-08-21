@@ -29,7 +29,7 @@ export class JobNotifier {
     }
 
 
-
+    // TODO: Don't use reference comparison
     private removeClient(client) {
         for (let queue of this.clients.keys()) {
 
@@ -37,6 +37,7 @@ export class JobNotifier {
 
             for (let c of queueClients) {
                 if (c.client === c) {
+                    console.log('client removed successfully')
                     availableJobQueues[queue].off('global:completed', c.listener)
                     queueClients.splice(queueClients.indexOf(c), 1)
                 }
@@ -98,7 +99,7 @@ export class JobNotifier {
 
     private generateQueueCompleteListener(client, queue: string) {
         return (job, result) => {
-            console.log('job complete: ', job.data.queue, job.data)
+            console.log('job complete: ', queue, job.data)
             client.emit(`job-complete:${queue}`, job.data) 
         }
     }
