@@ -13,6 +13,8 @@ let availableJobs = {
 
 
 
+
+
 export default function jobs(io) {
     /*
     repoStatsQueue.on('global:completed', function(job, result){
@@ -23,8 +25,9 @@ export default function jobs(io) {
     let jobsIo = io.of('/jobs')
     
     jobsIo.on('connection', function(client) {
-        client.on('subscribe', data => {
+        client.jobCompleteListeners = []
 
+        client.on('subscribe', data => {
             
             console.log('Subscribe')
             repoStatsQueue.on('global:completed', (job, result) => {

@@ -46,7 +46,7 @@ export class JobNotifier {
 
 
     private setupWebSocket() {
-        
+        /*
         for (let queue in availableJobQueues) {
             this.clients.set(queue, [])
 
@@ -55,18 +55,27 @@ export class JobNotifier {
                 this.onJobComplete(queue, job.data)
                 // client.emit('job-complete', { data: job.data, result })
             })
-        }
+        }*/
         
 
         this.io.on('connection', function(client) {
+            client.jobCompleteListeners = []
+
             client.on('subscribe', data => {                
 
                 if (availableQueueNames.includes(data.queue)) {
                     console.log(`Subscribing to ${data.queue}`)
                     let queueClients = this.clients.get(data.queue)
-                    if (!queueClients.includes(client))
+
+                    if (!queueClients.includes(client)) {
+                        let listener = this.generateListener(client, data.queue)
+                        client.jobCompleteListeners.push(listener)
                         queueClients.push(client)
 
+                        availableJobQueues[data.queue].on('global:completed', listener)                        
+                    }
+
+                    
                 }
                 else {
                     console.log(`Unable to subscribe to queue ${data.queue}, no such job queue available.`)
@@ -78,7 +87,7 @@ export class JobNotifier {
             })
 
             client.on('disconnect', () => {
-
+                // TODO
                 //repoStatsQueue.
                 console.log('disconnected')
             })
@@ -87,5 +96,11 @@ export class JobNotifier {
     }
 
 
+    private generateListener(client, queue: string) {
+        return (job, result) => {
+            console.log('job complete: ', job.data.queue, job.data)
+            client.emit(`job-complete:${queue}`, job.data) 
+        }
+    }
 
 }
