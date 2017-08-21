@@ -9,7 +9,9 @@ let availableJobQueues = {
 let availableQueueNames = Object.getOwnPropertyNames(availableJobQueues)
 
 
-
+/**
+ * TODO: Send only jobs owned by the client
+ */
 export class JobNotifier {
 
     private io
@@ -27,38 +29,30 @@ export class JobNotifier {
     }
 
 
-    private onJobComplete(queue: string, data) {
-        for (let client of this.clients.get(queue)) 
-            client.emit(`job-complete:${queue}`, data)        
-    }
 
     private removeClient(client) {
         for (let queue of this.clients.keys()) {
 
             let queueClients = this.clients.get(queue)
 
-            for (let client of queueClients) {
-                if (client === client)
-                    queueClients.splice(queueClients.indexOf(client), 1)
+            for (let c of queueClients) {
+                if (c.client === c) {
+                    availableJobQueues[queue].off('global:completed', c.listener)
+                    queueClients.splice(queueClients.indexOf(c), 1)
+                }
             }
         }
     }
 
 
-    private setupWebSocket() {
-        /*
+
+    private setupWebSocket() {        
+
         for (let queue in availableJobQueues) {
             this.clients.set(queue, [])
+        }        
 
-            availableJobQueues[queue].on('global:completed', (job, result) => {
-                console.log('job complete: ', queue, job.data)
-                this.onJobComplete(queue, job.data)
-                // client.emit('job-complete', { data: job.data, result })
-            })
-        }*/
-        
-
-        this.io.on('connection', function(client) {
+        this.io.on('connection', client => {
             client.jobCompleteListeners = []
 
             client.on('subscribe', data => {                
@@ -67,12 +61,11 @@ export class JobNotifier {
                     console.log(`Subscribing to ${data.queue}`)
                     let queueClients = this.clients.get(data.queue)
 
-                    if (!queueClients.includes(client)) {
-                        let listener = this.generateListener(client, data.queue)
-                        client.jobCompleteListeners.push(listener)
-                        queueClients.push(client)
+                    if (!queueClients.some( c => c.client === client )) {
+                        let listener = this.generateQueueCompleteListener(client, data.queue)
+                        queueClients.push({ client, listener })
 
-                        availableJobQueues[data.queue].on('global:completed', listener)                        
+                        availableJobQueues[data.queue].on('global:completed', listener)
                     }
 
                     
@@ -86,9 +79,16 @@ export class JobNotifier {
                 console.log(data)
             })
 
+
+            client.on('unsubscribe', data => {
+                // TODO
+                //this.removeClient(client)
+            })
+
+
             client.on('disconnect', () => {
                 // TODO
-                //repoStatsQueue.
+                this.removeClient(client)
                 console.log('disconnected')
             })
         })  
@@ -96,7 +96,7 @@ export class JobNotifier {
     }
 
 
-    private generateListener(client, queue: string) {
+    private generateQueueCompleteListener(client, queue: string) {
         return (job, result) => {
             console.log('job complete: ', job.data.queue, job.data)
             client.emit(`job-complete:${queue}`, job.data) 
