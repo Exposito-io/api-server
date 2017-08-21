@@ -7,6 +7,7 @@ import projects from './projects'
 import repoStats from './repo-stats'
 import tokens from './tokens'
 import jobs from './jobs'
+import users from './users'
 import * as auth from '../authentication'
 //import { BitcoinCoreWallet } from '../../models/core/bitcoin-core-wallet'
 
@@ -22,6 +23,7 @@ export default function v0(io) {
     router.use('/organizations', auth.hasAccess, organizations)
     router.use('/repo-stats', auth.hasAccess, repoStats)
     router.use('/tokens', auth.hasAccess, tokens)
+    router.use('/users', auth.hasAccess, users)
     router.use('/wallets', auth.hasAccess, wallets)
 
     return router

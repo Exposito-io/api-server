@@ -81,6 +81,20 @@ export class UserProvider {
         })
     }
 
+
+    /**
+     * General search method
+     * 
+     * @param str 
+     */
+    async find(str: string): Promise<User[]> {
+        let db = await dbFactory.getConnection(config.database)
+        let userData = await db.collection('users').find({ name: new RegExp(str, "i") }).toArray()
+
+        console.log('Users found: ', userData)
+        return userData.map(user => User.fromJSON(user))
+    }
+
     /**
      * Validates that users belong to
      * an organization
