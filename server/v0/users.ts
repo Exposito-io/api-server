@@ -21,6 +21,19 @@ router.get('/', async (req, res) => {
     }
 })
 
+
+
+router.get('/find', async (req, res) => {
+    try {       
+        console.log(`Finding for ${req.query.q}`)
+        let users = await provider.find(req.query.q)
+        res.json(users)
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
+
 router.get('/:id', async (req, res) => {
     try {
         let user = provider.findById(req.params.id)
@@ -31,14 +44,6 @@ router.get('/:id', async (req, res) => {
 })
 
 
-router.get('/find', async (req, res) => {
-    try {       
-        let users = await provider.find(req.query.q)
-        res.json(users)
-    } catch(e) {
-        res.json({ error: e})
-    }
-})
 
 
 
