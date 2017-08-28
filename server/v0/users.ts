@@ -36,7 +36,7 @@ router.get('/find', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     try {
-        let user = provider.findById(req.params.id)
+        let user = await provider.findById(req.params.id)
         res.json(user)
     } catch(e) {
         res.json({ error: e})
