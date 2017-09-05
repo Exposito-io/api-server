@@ -69,6 +69,7 @@ export class GithubStatsProvider {
                         .groupBy('email')
                         .map(authorStats => ({
                             name: authorStats[0].name,
+                            image: authorStats[0].image,
                             email: authorStats[0].email,
                             linesOfCode: authorStats.reduce((totalLines, authorStats) => totalLines.plus(authorStats.linesOfCode), new BigNumber(0)).toString(),
                             fileCount: authorStats.reduce((totalFiles, authorStats) => totalFiles.plus(authorStats.fileCount), new BigNumber(0)).toString(),
