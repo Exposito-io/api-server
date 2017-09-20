@@ -77,24 +77,30 @@ export class GithubStatsProvider {
                         }))
                         .value()
                         
-
+        // TODO: Return better data
         return {
+            owner: stats[0].repo,
+            repo: stats[0].repo,
             authors: authors,
-            totalLinesOfCode: stats.reduce((totalLines, stat) => totalLines.plus(stat.totalLinesOfCode), new BigNumber(0)).toString(),
-            totalFileCount: stats.reduce((totalFile, stat) => totalFile.plus(stat.totalFileCount), new BigNumber(0)).toString()
+            totalLinesOfCode: stats.reduce((totalLines, stat) => totalLines.plus(stat.totalLinesOfCode), new BigNumber(0)).toNumber(),
+            totalFileCount: stats.reduce((totalFile, stat) => totalFile.plus(stat.totalFileCount), new BigNumber(0)).toNumber(),
+            lastCommit: stats[0].lastCommit
         }
     }
 
 
     private convertMongoRepoStats(stats: any): RepoStats {
         return {
+            owner: stats.owner,
+            repo: stats.repo,
             authors: stats.authors.map(author => {
                 author.linesOfCode = author.linesOfCode.toString()
                 author.fileCount = author.fileCount.toString()
                 return author
             }),
             totalLinesOfCode: stats.totalLinesOfCode.toString(),
-            totalFileCount: stats.totalFileCount.toString()
+            totalFileCount: stats.totalFileCount.toString(),
+            lastCommit: stats.lastCommit
         }
     }
 

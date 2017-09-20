@@ -98,8 +98,8 @@ export class JobNotifier {
 
     private generateQueueCompleteListener(client, queue: string) {
         return (job, result) => {
-            console.log('job complete: ', queue, job.data)
-            client.emit(`job-complete:${queue}`, job.data) 
+            console.log('job complete: ', queue, result)
+            client.emit(`job-complete:${queue}`, result) 
         }
     }
 
