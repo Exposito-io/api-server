@@ -20,7 +20,7 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
     try {
-        let wallets = await walletProvider.fetchWalletsForClients([])
+        let wallets = await walletProvider.fetchWalletsForClients([req.user.id])
         res.json({
             wallets: wallets.map(wallet => { 
                 return {
@@ -38,18 +38,16 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        if (!(await userProvider.validateUsersBelongToOrganization(req.body.organizationId, [req.user.id])))
+        if (!(await userProvider.validateProjectMembers(req.body.projectId, [req.user.id])))
             throw "User doesn't belong to organization"        
 
         let wallet = await walletProvider.createBitcoinWallet({
             name: req.body.name,
-            organizationId: req.body.organizationId,
+            projectId: req.body.projectId,
             labels: []
         })
 
-
         res.json(wallet)
-
 
     } catch(e) {
         res.json({ error: e })

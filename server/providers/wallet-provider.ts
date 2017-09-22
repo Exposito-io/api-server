@@ -4,6 +4,7 @@ import * as dbFactory from 'mongo-factory'
 import { BitcoinWallet, PeriodicPayment, Wallet, BitcoinWalletOptions } from 'models'
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
+import { convertObjectIdsToStrings, convertStringsToObjectIds } from '../lib/convert-object-ids'
 
 
 class WalletProvider {
@@ -23,7 +24,7 @@ class WalletProvider {
         if (wallets.length === 0)
             throw("No user found")
         else
-            return Wallet.fromJSON(wallets[0])
+            return Wallet.fromJSON(convertObjectIdsToStrings(wallets[0]))
 
     }
 
@@ -35,11 +36,12 @@ class WalletProvider {
             let db = await dbFactory.getConnection(config.database)
             let wallets = await db.collection('wallets').find({}).toArray()
 
-            return wallets.map(wallet => Wallet.fromJSON(wallet))
+            return wallets.map(wallet => Wallet.fromJSON(convertObjectIdsToStrings(wallet)))
         } catch(e) {
             throw('Error fetching wallets')
         }
     }
+
 
     async createBitcoinWallet(params: BitcoinWalletOptions): Promise<BitcoinWallet> {
 
@@ -47,7 +49,6 @@ class WalletProvider {
         let col = await db.collection('wallets') as Collection
 
         let wallet = BitcoinWallet.fromParams(params)
-
 
         let client = await CoreClient.getClient()
 
@@ -68,7 +69,7 @@ class WalletProvider {
         let str = client.export()
         wallet.coreWallet = JSON.parse(str)
 
-        let result = await col.insertOne(wallet)
+        let result = await col.insertOne(convertStringsToObjectIds(wallet))
    
         
         if (result.insertedCount === 1) {

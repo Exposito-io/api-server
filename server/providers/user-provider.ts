@@ -5,10 +5,12 @@ import config from '../../config'
 import * as dbFactory from 'mongo-factory'
 import { User } from 'models'
 import { OrganizationProvider } from './organization-provider'
+import { ProjectProvider } from './project-provider'
 
 
 
 const orgProvider = new OrganizationProvider()
+const projectProvider = new ProjectProvider()
 
 /**
  * User provider
@@ -103,6 +105,7 @@ export class UserProvider {
      * Validates that users belong to
      * an organization
      * 
+     * @deprecated
      * @param organizationId 
      * @param userIds 
      */
@@ -111,6 +114,19 @@ export class UserProvider {
 
         return userIds.every(userId => org.members.some(member => member.userId === userId))
     }
+
+    /**
+     * Promise returns true if specified users are 
+     * members of a project
+     * 
+     * @param projectnId 
+     * @param userIds 
+     */
+    async validateProjectMembers(projectId: string, userIds: string[]): Promise<boolean> {
+        let org = await projectProvider.getProjectById(projectId)
+
+        return userIds.every(userId => org.members.some(member => member.userId === userId))
+    }    
 
 
     private _createUserFromGoogleProfile(googleProfile) {

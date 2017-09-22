@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 import { ObjectID } from 'mongodb'
 
+// TODO: does not work with inheritance
 export function convertStringsToObjectIds(obj: any, maxLevel: number = 50): any {
     for(let key in obj) {
         if (obj[key] instanceof Object)
@@ -14,7 +15,7 @@ export function convertStringsToObjectIds(obj: any, maxLevel: number = 50): any 
     return obj
 }
 
-
+// TODO: does not work with inheritance
 export function convertObjectIdsToStrings(obj: any, maxLevel: number = 50): any {
     for(let key in obj) {
         if (obj[key] instanceof Object)
