@@ -13,11 +13,11 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
     try {
-        if (!(await userProvider.validateUsersBelongToOrganization(req.query.organizationId, [req.user.id])))
-            throw "User doesn't belong to organization"
+        if (!(await userProvider.validateProjectMembers(req.query.projectId, [req.user.id])))
+            throw "User doesn't belong to project"
 
         let periodicPayments = await paymentProvider.getPeriodicPayments({
-            organizationId: req.query.organizationId
+            projectId: req.query.projectId
         })
         res.json({
             periodicPayments
@@ -30,12 +30,12 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        if (!(await userProvider.validateUsersBelongToOrganization(req.body.organizationId, [req.user.id])))
-            throw "User doesn't belong to organization"
+        if (!(await userProvider.validateProjectMembers(req.body.projectId, [req.user.id])))
+            throw "User doesn't belong to project"
 
         let periodicPayment = await paymentProvider.createPeriodicPayment({
             schedule: req.body.schedule,
-            organizationId: req.body.organizationId,
+            projectId: req.body.projectId,
             sourceWalletId: req.body.sourceWalletId,
 
             destination: req.body.destination,
@@ -65,7 +65,7 @@ router.get('/:id', async (req, res) => {
     try {
         let periodicPayment = await paymentProvider.fetchById(req.params.id)
 
-        if (!(await userProvider.validateUsersBelongToOrganization(periodicPayment.organizationId, [req.user.id])))
+        if (!(await userProvider.validateUsersBelongToOrganization(periodicPayment.projectId, [req.user.id])))
             throw 'Invalid'
             
         res.json(periodicPayment)

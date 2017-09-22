@@ -125,7 +125,10 @@ export class UserProvider {
     async validateProjectMembers(projectId: string, userIds: string[]): Promise<boolean> {
         let org = await projectProvider.getProjectById(projectId)
 
-        return userIds.every(userId => org.members.some(member => member.userId === userId))
+        if (org)
+            return userIds.every(userId => org.members.some(member => member.userId === userId))
+        else
+            return null
     }    
 
 

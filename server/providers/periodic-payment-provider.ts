@@ -41,7 +41,7 @@ class PeriodicPaymentProvider {
         let db = await dbFactory.getConnection(config.database)
         let periodicPayments = await db.collection('periodic-payments')
                                         .find({
-                                            organizationId: new ObjectID(filters.organizationId)
+                                            organizationId: new ObjectID(filters.projectId)
                                         })
                                         .toArray()
 
@@ -61,13 +61,6 @@ class PeriodicPaymentProvider {
         let insertResult = await db.collection('periodic-payments').insertOne(periodicPayment)
    
         if (insertResult.insertedCount === 1) {
-            let updateResult = await db.collection('wallets')
-                                 .updateOne({ _id: periodicPayment.sourceWalletId },
-                                 { $push: { _periodicPaymentIds: insertResult.insertedId }})
-
-            if (updateResult.modifiedCount !== 1)
-                throw('Error updating Wallet')
-
             return this.fetchById(insertResult.insertedId)
 
         }
@@ -86,16 +79,8 @@ class PeriodicPaymentProvider {
 
         let insertResult = await db.collection('periodic-payments').insertOne(periodicPayment)
 
-        if (insertResult.insertedCount === 1) {
-            let updateResult = await db.collection('wallets')
-                                 .updateOne({ _id: periodicPayment.sourceWalletId },
-                                 { $push: { _periodicPaymentIds: insertResult.insertedId }})
-
-            if (updateResult.modifiedCount !== 1)
-                throw('Error updating Wallet')
-            
-            return this.fetchById(insertResult.insertedId)
-                
+        if (insertResult.insertedCount === 1) {          
+            return this.fetchById(insertResult.insertedId)                
         }
         else {
             throw('Problem inserting PeriodicPayment')
