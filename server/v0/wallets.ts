@@ -44,7 +44,7 @@ router.post('/', async (req, res) => {
         let wallet = await walletProvider.createBitcoinWallet({
             name: req.body.name,
             projectId: req.body.projectId,
-            labels: []
+            labels: req.body.labels
         })
 
         res.json(wallet)
