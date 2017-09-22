@@ -38,6 +38,8 @@ router.post('/', async (req, res) => {
             projectId: req.body.projectId,
             sourceWalletId: req.body.sourceWalletId,
 
+            description: req.body.description,
+
             destination: req.body.destination,
             destinationType: new Number(req.body.destinationType).valueOf(),
 
