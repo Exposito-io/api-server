@@ -1,7 +1,7 @@
-import { ObjectID } from 'mongodb'
+import { ObjectID, Collection } from 'mongodb'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
-import { BitcoinWallet, PeriodicPayment, Wallet, CreatePaymentRequest, PaymentDestination, WalletType, ExpositoError, ErrorCode } from 'models'
+import { BitcoinWallet, PeriodicPayment, Wallet, CreatePaymentRequest, PaymentDestination, WalletType, ExpositoError, ErrorCode, Transaction } from 'models'
 import { WalletProvider } from './wallet-provider'
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
@@ -48,6 +48,12 @@ export class TransactiontProvider {
 
         let result = await fn(request)
 
+
+        let db = await dbFactory.getConnection(config.database)
+        let col = db.collection('transactions') as Collection
+        
+        let userData = await col.insertOne({ name: new RegExp(str, "i") }).toArray()
+        
         // TODO: unlock
 
         return result
