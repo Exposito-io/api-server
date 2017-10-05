@@ -24,9 +24,10 @@ router.get('/', async (req, res) => {
         res.json({
             wallets: wallets.map(wallet => { 
                 return {
-                    id: wallet.getId(), 
-                    name: wallet.getName(), 
-                    labels: wallet.getLabels() 
+                    id: wallet.id, 
+                    name: wallet.name, 
+                    labels: wallet.labels ,
+                    type: wallet.type
                 }
             })
         })
@@ -41,7 +42,8 @@ router.post('/', async (req, res) => {
         if (!(await userProvider.validateProjectMembers(req.body.projectId, [req.user.id])))
             throw "User doesn't belong to organization"        
 
-        let wallet = await walletProvider.createBitcoinWallet({
+        //let wallet = await walletProvider.createBitcoinWallet({
+        let wallet = await walletProvider.createExpositoWallet({
             name: req.body.name,
             projectId: req.body.projectId,
             labels: req.body.labels
@@ -54,42 +56,7 @@ router.post('/', async (req, res) => {
     }
 })
 
-/*
-router.post('/', async (req, res) => {
-    try {
-        if (!validateWalletName(req.body.name))
-            res.json({ error: 'Invalid wallet name'})
 
-        let walletName = req.body.name
-
-        let client = await CoreClient.getClient()
-
-        client.seedFromRandomWithMnemonic({
-            network: config.bitcoinNetwork,
-            passphrase: undefined,
-            language: 'en',
-        })
-
-        let secret = await client.createWallet(walletName, 'copayer1', 1, 1, {
-            network: config.bitcoinNetwork
-        })
-
-
-        console.log(' * ' + _.capitalize(config.bitcoinNetwork) + ' Wallet Created.')
-        await CoreClient.saveClient({ host: config.coreWalletServiceHost, file: 'C:\\weblog\\.wallet.dat' }, client)
-
-        if (secret)
-            console.log('   - Secret to share:\n\t' + secret)
-
-        res.json({ success: 1 })
-
-
-
-    } catch(e) {
-        res.json({ error: e })
-    }
-})
-*/
 
 router.get('/:id', async (req, res) => {
     try {

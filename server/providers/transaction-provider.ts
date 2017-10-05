@@ -39,7 +39,7 @@ export class TransactiontProvider {
         let wallet = await this.walletProvider.fetchById(request.sourceWalletId)
         // TODO: Lock wallet
 
-        let fnConfig = this.createFunctions.find(p => p.from === wallet.getType() && p.to === request.destinationType)
+        let fnConfig = this.createFunctions.find(p => p.from === wallet.type && p.to === request.destinationType)
 
         if (!fnConfig)
             throw new ExpositoError(ErrorCode.UNKNOWN_PAYMENT_REQUEST)
@@ -52,7 +52,7 @@ export class TransactiontProvider {
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('transactions') as Collection
         
-        let userData = await col.insertOne({ name: new RegExp(str, "i") }).toArray()
+        //let userData = await col.insertOne({ name: new RegExp(str, "i") }).toArray()
         
         // TODO: unlock
 

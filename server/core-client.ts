@@ -135,7 +135,7 @@ class Utils {
         }
         else {
           let wallet = await walletProvider.fetchById(walletId)
-          if (wallet.getType() === WalletType.BITCOIN) {
+          if (wallet.type === WalletType.BITCOIN) {
             let bitcoinWallet = wallet as BitcoinWallet
             let coreWallet = JSON.stringify(bitcoinWallet.getCoreWallet())
             return await Utils.doLoad2(client, false, coreWallet, null)
