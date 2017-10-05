@@ -26,8 +26,10 @@ router.get('/', async (req, res) => {
                 return {
                     id: wallet.id, 
                     name: wallet.name, 
-                    labels: wallet.labels ,
-                    type: wallet.type
+                    labels: wallet.labels,
+                    type: wallet.type,
+                    amount: wallet.amount,
+                    currency: wallet.currency
                 }
             })
         })

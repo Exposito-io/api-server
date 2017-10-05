@@ -1,7 +1,7 @@
 import { ObjectID, Collection } from 'mongodb'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
-import { BitcoinWallet, ExpositoWallet, PeriodicPayment, Wallet, BitcoinWalletOptions } from 'models'
+import { BitcoinWallet, ExpositoWallet, PeriodicPayment, Wallet, BitcoinWalletOptions, ExpositoWalletOptions } from 'models'
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
 import { convertObjectIdsToStrings, convertStringsToObjectIds } from '../lib/convert-object-ids'
@@ -37,7 +37,7 @@ class WalletProvider {
             let wallets = await db.collection('wallets').find({}).toArray()
 
             return wallets.map(wallet => Wallet.fromJSON(convertObjectIdsToStrings(wallet)))
-            
+
         } catch(e) {
             throw('Error fetching wallets')
         }
@@ -82,7 +82,7 @@ class WalletProvider {
     }
 
 
-    async createExpositoWallet(params: BitcoinWalletOptions): Promise<BitcoinWallet> {
+    async createExpositoWallet(params: ExpositoWalletOptions): Promise<ExpositoWallet> {
 
         let db = await dbFactory.getConnection(config.database)
         let walletCollection = await db.collection('wallets') as Collection
@@ -93,8 +93,7 @@ class WalletProvider {
         wallet.projectId = new ObjectID(wallet.projectId) as any
 
         let result = await walletCollection.insertOne(convertStringsToObjectIds(wallet))
-   
-        
+               
         if (result.insertedCount === 1) {
             wallet.id = result.insertedId.toHexString()
             return wallet
