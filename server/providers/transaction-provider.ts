@@ -81,6 +81,24 @@ export class TransactiontProvider {
 
 
         let db = await dbFactory.getConnection(config.database)
+
+        let walletCollection = db.collection('wallets') as Collection
+
+        if (request.sourceType === PaymentDestination.EXPOSITO_WALLET) {
+            let wallet = await walletCollection.findOne({ _id: new ObjectID(request.sourceWalletId) })
+            let walletAmount = Money.fromStringDecimal(wallet.amount, wallet.currency)
+            let txAmount = Money.fromStringDecimal(request.amount, request.currency)
+
+            let newWalletAmount = walletAmount.subtract(txAmount)
+            // TODO check if less than 0, etc...
+
+            let r = await walletCollection.updateOne({ _id: new ObjectID(request.sourceWalletId)}, { $set: { amount: newWalletAmount.toString() } })
+        }
+
+        if (request.destinationType === PaymentDestination.EXPOSITO_WALLET) {
+            // TODO: Update amount
+        }
+
         let transactionsCollection = db.collection('transactions') as Collection
         
         let t: Transaction = {
@@ -162,6 +180,24 @@ export class TransactiontProvider {
 
     async getFees(): Promise<Money> {
         return Money.fromInteger(100e2, 'satoshi')
+    }
+
+
+
+    private async addAmountToWallet(walletId: string, amount: string, currency: string): Promise<void> {
+        let db = await dbFactory.getConnection(config.database)        
+        let walletCollection = db.collection('wallets') as Collection
+
+        let walletMongoId = new ObjectID(walletId)
+
+        let wallet = await walletCollection.findOne({ _id: walletMongoId })
+        let walletAmount = Money.fromStringDecimal(wallet.amount, wallet.currency)
+        let txAmount = Money.fromStringDecimal(amount, currency)
+
+        let newWalletAmount = walletAmount.subtract(txAmount)
+        // TODO check if less than 0, etc...
+
+        let r = await walletCollection.updateOne({ _id: walletMongoId }, { $set: { amount: newWalletAmount.toString() } })
     }
 
  
