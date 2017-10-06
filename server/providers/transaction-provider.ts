@@ -1,7 +1,17 @@
 import { ObjectID, Collection } from 'mongodb'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
-import { BitcoinWallet, PeriodicPayment, Wallet, CreatePaymentRequest, PaymentDestination, WalletType, ExpositoError, ErrorCode, Transaction } from 'models'
+import { 
+    BitcoinWallet, 
+    PeriodicPayment, 
+    Wallet, 
+    CreatePaymentRequest, 
+    PaymentDestination, 
+    WalletType, 
+    Transaction,
+    ExpositoError, 
+    ErrorCode, 
+} from 'models'
 import { WalletProvider } from './wallet-provider'
 import CoreClient from '../core-client'
 import * as _ from 'lodash'
@@ -60,6 +70,37 @@ export class TransactiontProvider {
 
     }
 
+    /**
+     * Method used by the demo, should not be used in production
+     * @param request 
+     */
+    async createPaymentDemo(request: CreatePaymentRequest): Promise<any> {
+
+        if (!CreatePaymentRequest.validate(request))
+            throw(new ExpositoError(ErrorCode.INVALID_CREATE_PAYMENT_REQUEST))
+
+
+        let db = await dbFactory.getConnection(config.database)
+        let transactionsCollection = db.collection('transactions') as Collection
+        
+        let t: Transaction = {
+            sourceWalletId: request.sourceWalletId,
+            sourceType: request.sourceType,
+            destination: request.destination,
+            destinationType: request.destinationType,
+            currency: request.currency,
+            amount: request.amount,
+            creationDate: new Date(),
+            endDate: new Date(),
+            status: 1
+        }
+
+        let result = await transactionsCollection.insertOne(t)
+        
+
+        return t
+
+    }
 
 
     async createBitcoinPayment(request: CreatePaymentRequest/*CreateBitcoinPaymentOptions*/): Promise<string> {
