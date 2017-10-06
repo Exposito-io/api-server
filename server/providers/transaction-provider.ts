@@ -70,7 +70,7 @@ export class TransactiontProvider {
 
     }
 
-    
+
     /**
      * Returns transactions for a specific wallet
      * // TODO: Add date param
@@ -81,6 +81,7 @@ export class TransactiontProvider {
         
         let txCollection = db.collection('transactions') as Collection
 
+        
         let txJson = await txCollection.find({ 
             $or: [{ 
                 sourceWalletId: walletId, 
@@ -90,6 +91,11 @@ export class TransactiontProvider {
                 destinationType: PaymentDestination.EXPOSITO_WALLET 
             }]
         }).toArray()
+        /*
+        let txJson = await txCollection.find({ 
+                destination: new ObjectID(walletId),
+                destinationType: PaymentDestination.EXPOSITO_WALLET 
+        }).toArray()        */
 
         return txJson.map(Transaction.fromJSON)
 

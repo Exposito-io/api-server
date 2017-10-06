@@ -20,19 +20,13 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
     try {
-        let wallets = await walletProvider.fetchWalletsForClients([req.user.id])
-        res.json({
-            wallets: wallets.map(wallet => { 
-                return {
-                    id: wallet.id, 
-                    name: wallet.name, 
-                    labels: wallet.labels,
-                    type: wallet.type,
-                    amount: wallet.amount,
-                    currency: wallet.currency
-                }
-            })
-        })
+        if (req.query.wallet) {
+            // TODO: Verify that wallet belongs to user
+
+            let transactions = await transactionProvider.getTransactionsForWallet(req.query.wallet)
+
+            res.json(transactions)
+        }
     } catch(e) {
         res.json({ error: e})
     }
