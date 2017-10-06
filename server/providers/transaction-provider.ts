@@ -70,6 +70,31 @@ export class TransactiontProvider {
 
     }
 
+    
+    /**
+     * Returns transactions for a specific wallet
+     * // TODO: Add date param
+     * @param walletId 
+     */
+    async getTransactionsForWallet(walletId: string): Promise<Transaction[]>{
+        let db = await dbFactory.getConnection(config.database)
+        
+        let txCollection = db.collection('transactions') as Collection
+
+        let txJson = await txCollection.find({ 
+            $or: [{ 
+                sourceWalletId: walletId, 
+                sourceType: PaymentDestination.EXPOSITO_WALLET 
+            }, { 
+                destination: walletId,
+                destinationType: PaymentDestination.EXPOSITO_WALLET 
+            }]
+        }).toArray()
+
+        return txJson.map(Transaction.fromJSON)
+
+    }
+
     /**
      * Method used by the demo, should not be used in production
      * @param request 
