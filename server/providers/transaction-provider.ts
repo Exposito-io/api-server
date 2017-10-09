@@ -118,10 +118,10 @@ export class TransactiontProvider {
         let walletCollection = db.collection('wallets') as Collection
 
         if (request.sourceType === PaymentDestination.EXPOSITO_WALLET) 
-            this.removeAmountFromWallet(request.sourceWalletId, request.amount, request.currency)        
+            await this.removeAmountFromWallet(request.sourceWalletId, request.amount, request.currency)        
 
         if (request.destinationType === PaymentDestination.EXPOSITO_WALLET) 
-            this.addAmountToWallet(request.destination, request.amount, request.currency)
+            await this.addAmountToWallet(request.destination, request.amount, request.currency)
         
 
         let transactionsCollection = db.collection('transactions') as Collection
@@ -278,10 +278,10 @@ class CreateBitcoinPaymentOptions {
 
 
 function convertBtcToUsd(btcAmount: Money) {
-    return Money.fromStringDecimal(btcAmount.multiply(4526).toString(), 'USD')
+    return Money.fromStringDecimal(btcAmount.multiply(4526).toString(), 'USD') as Money
 }
 
 
 function convertUsdToBtc(usdAmount: Money) {    
-    return Money.fromStringDecimal(usdAmount.divide(4526).toString(), 'BTC')
+    return Money.fromStringDecimal(usdAmount.toString(), 'BTC').divide(4526) as Money
 }
