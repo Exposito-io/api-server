@@ -20,7 +20,6 @@ import { Money, Currencies } from 'models'
 import * as BigNumber from 'bignumber.js'
 
 
-
 export class TransactiontProvider {
 
     protected createFunctions = [
@@ -92,13 +91,15 @@ export class TransactiontProvider {
                 destinationType: PaymentDestination.EXPOSITO_WALLET 
             }]
         }).toArray()
-        /*
-        let txJson = await txCollection.find({ 
-                destination: new ObjectID(walletId),
-                destinationType: PaymentDestination.EXPOSITO_WALLET 
-        }).toArray()        */
+
 
         return txJson.map(Transaction.fromJSON)
+                     .map(tx => {
+                        if (tx.sourceWalletId === walletId) 
+                            tx.amount = new BigNumber(tx.amount).mul(-1).toString()
+                        
+                        return tx
+        })
 
     }
 
@@ -279,6 +280,7 @@ class CreateBitcoinPaymentOptions {
 function convertBtcToUsd(btcAmount: Money) {
     return Money.fromStringDecimal(btcAmount.multiply(4526).toString(), 'USD')
 }
+
 
 function convertUsdToBtc(usdAmount: Money) {    
     return Money.fromStringDecimal(usdAmount.divide(4526).toString(), 'BTC')
