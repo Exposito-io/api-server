@@ -9,6 +9,8 @@ import { TransactiontProvider } from '../providers/transaction-provider'
 import { UserProvider } from '../providers/user-provider'
 import { Money, FixedPayment, FixedPaymentOptions } from 'models'
 
+
+
 const walletProvider = new WalletProvider()
 const paymentProvider = new PeriodicPaymentProvider()
 const transactionProvider = new TransactiontProvider()
@@ -96,6 +98,8 @@ router.get('/:id/balance', async (req, res) => {
         res.json({ error: e})
     }
 })
+
+
 
 
 

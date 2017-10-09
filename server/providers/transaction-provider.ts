@@ -17,6 +17,7 @@ import CoreClient from '../core-client'
 import * as _ from 'lodash'
 import { ExchangeRateProvider } from 'currency-converter'
 import { Money, Currencies } from 'models'
+import * as BigNumber from 'bignumber.js'
 
 
 
@@ -208,20 +209,31 @@ export class TransactiontProvider {
 
 
     private async addAmountToWallet(walletId: string, amount: string, currency: string): Promise<void> {
-        let db = await dbFactory.getConnection(config.database)        
-        let walletCollection = db.collection('wallets') as Collection
+        try {
+            let db = await dbFactory.getConnection(config.database)        
+            let walletCollection = db.collection('wallets') as Collection
 
-        let walletMongoId = new ObjectID(walletId)
+            let walletMongoId = new ObjectID(walletId)
 
-        let wallet = await walletCollection.findOne({ _id: walletMongoId })
-        let walletAmount = Money.fromStringDecimal(wallet.amount, wallet.currency)
-        let txAmount = Money.fromStringDecimal(amount, currency)
+            let wallet = await walletCollection.findOne({ _id: walletMongoId })
+            let walletAmount = Money.fromStringDecimal(wallet.amount, wallet.currency)
+            let txAmount = Money.fromStringDecimal(amount, currency)
 
-        let newWalletAmount = walletAmount.add(txAmount)
-        // TODO check if less than 0, etc...
+            if (txAmount.currency === 'USD' && wallet.currency === 'BTC')
+                txAmount = convertUsdToBtc(txAmount)
 
-        let r = await walletCollection.updateOne({ _id: walletMongoId }, { $set: { amount: newWalletAmount.toString() } })
+            if (txAmount.currency === 'BTC' && wallet.currency === 'USD')
+                txAmount = convertBtcToUsd(txAmount)        
+
+            let newWalletAmount = walletAmount.add(txAmount)
+            // TODO check if less than 0, etc...
+
+            let r = await walletCollection.updateOne({ _id: walletMongoId }, { $set: { amount: newWalletAmount.toString() } })
+        } catch(e) {
+            console.log('Error adding amount to wallet', e)
+        }
     }
+
 
     private async removeAmountFromWallet(walletId: string, amount: string, currency: string): Promise<void> {
         let db = await dbFactory.getConnection(config.database)        
@@ -232,6 +244,12 @@ export class TransactiontProvider {
         let wallet = await walletCollection.findOne({ _id: walletMongoId })
         let walletAmount = Money.fromStringDecimal(wallet.amount, wallet.currency)
         let txAmount = Money.fromStringDecimal(amount, currency)
+
+        if (txAmount.currency === 'USD' && wallet.currency === 'BTC')
+            txAmount = convertUsdToBtc(txAmount)
+
+        if (txAmount.currency === 'BTC' && wallet.currency === 'USD')
+            txAmount = convertBtcToUsd(txAmount)           
 
         let newWalletAmount = walletAmount.subtract(txAmount)
         // TODO check if less than 0, etc...
@@ -254,4 +272,14 @@ class CreateBitcoinPaymentOptions {
     fee?: number
 
     note?: string
+}
+
+
+
+function convertBtcToUsd(btcAmount: Money) {
+    return Money.fromStringDecimal(btcAmount.multiply(4526).toString(), 'USD')
+}
+
+function convertUsdToBtc(usdAmount: Money) {    
+    return Money.fromStringDecimal(usdAmount.divide(4526).toString(), 'BTC')
 }
