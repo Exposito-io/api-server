@@ -27,6 +27,19 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.get('/byWallet/:walletId', async (req, res) => {
+    try {
+        // TODO: Validate wallet belongs to user
+
+        let periodicPayments = await paymentProvider.getPeriodicPaymentsForWallet({
+            walletId: req.params.walletId
+        })
+        res.json(periodicPayments)
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
 
 router.post('/', async (req, res) => {
     try {

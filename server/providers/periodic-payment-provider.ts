@@ -6,7 +6,7 @@ import { WalletProvider } from './wallet-provider'
 import { convertObjectIdsToStrings, convertStringsToObjectIds } from '../lib/convert-object-ids'
 
 
-class PeriodicPaymentProvider {
+export class PeriodicPaymentProvider {
 
     private walletProvider: WalletProvider
 
@@ -41,13 +41,27 @@ class PeriodicPaymentProvider {
         let db = await dbFactory.getConnection(config.database)
         let periodicPayments = await db.collection('periodic-payments')
                                         .find({
-                                            organizationId: new ObjectID(filters.projectId)
+                                            projectId: new ObjectID(filters.projectId)
                                         })
                                         .toArray()
 
         return periodicPayments.map(periodicPayment => PeriodicPayment.fromJSON(periodicPayment))
 
     }
+
+
+    async getPeriodicPaymentsForWallet(filters: GetPeriodicPaymentByWallet) {
+        
+                let db = await dbFactory.getConnection(config.database)
+                let periodicPayments = await db.collection('periodic-payments')
+                                                .find({
+                                                    sourceWalletId: new ObjectID(filters.walletId)
+                                                })
+                                                .toArray()
+        
+                return periodicPayments.map(periodicPayment => PeriodicPayment.fromJSON(periodicPayment))
+        
+            }    
 
 
     async createPeriodicPayment(options: PeriodicPaymentOptions): Promise<PeriodicPayment> {
@@ -91,4 +105,11 @@ class PeriodicPaymentProvider {
 }
 
 
-export { PeriodicPaymentProvider }
+export class GetPeriodicPaymentByWallet {
+    walletId: string
+
+    static validate(filters: GetPeriodicPaymentByWallet): boolean {
+        //TODO
+        return true
+    }
+}

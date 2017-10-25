@@ -48,7 +48,8 @@ router.post('/', async (req, res) => {
         let wallet = await walletProvider.createExpositoWallet({
             name: req.body.name,
             projectId: req.body.projectId,
-            labels: req.body.labels
+            labels: req.body.labels,
+            description: req.body.description
         })
 
         res.json(wallet)

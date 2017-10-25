@@ -205,7 +205,7 @@ class Utils {
       let jsonCoreWallet = JSON.parse(str)
       //let wallet = BitcoinCoreWallet.fromObj(jsonCoreWallet)
       let wallet = jsonCoreWallet
-      walletProvider.createWallet(new BitcoinWallet({ name: wallet.walletName, coreWallet: wallet, projectId: '987', labels: [] }))
+      walletProvider.createWallet(new BitcoinWallet({ name: wallet.walletName, description: '', coreWallet: wallet, projectId: '987', labels: [] }))
       .then(newWallet => {
         cb(null, newWallet)
       })
