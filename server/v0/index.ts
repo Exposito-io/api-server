@@ -8,6 +8,7 @@ import projects from './projects'
 import repoStats from './repo-stats'
 import tokens from './tokens'
 import jobs from './jobs'
+import search from './search'
 import transactions from './transactions'
 import users from './users'
 import * as auth from '../authentication'
@@ -26,6 +27,7 @@ export default function v0(io) {
     router.use('/organizations', auth.hasAccess, organizations)
     router.use('/repo-stats', auth.hasAccess, repoStats)
     router.use('/transactions', auth.hasAccess, transactions)
+    router.use('/search', auth.hasAccess, search)
     router.use('/tokens', auth.hasAccess, tokens)
     router.use('/users', auth.hasAccess, users)
     router.use('/wallets', auth.hasAccess, wallets)
