@@ -1,0 +1,1 @@
+db.users.createIndex({ name: "text", email: "text"}, { weights: { name: 15, email: 5}})
