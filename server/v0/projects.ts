@@ -1,7 +1,7 @@
 import * as express from 'express'
 import config from '../../config'
 import { ProjectProvider } from '../providers'
-import { CreateOrganizationParams, ShareholderDescription, InvitedShareholderDescription, GithubShareholdersDescription } from 'models'
+import { CreateOrganizationParams, TokenholderDescription, InvitedTokenholderDescription, GithubTokenholdersDescription } from 'models'
 
 const projectProvider = new ProjectProvider()
 

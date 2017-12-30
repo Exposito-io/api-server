@@ -1,4 +1,4 @@
-import { Project, CreateProjectParams, ProjectShareholdersDistribution, CreateProjectShareholdersDistributionParams, ExpositoError, ErrorCode } from 'models'
+import { Project, CreateProjectParams, ProjectTokenholdersDistribution, CreateProjectTokenholdersDistributionParams, ExpositoError, ErrorCode } from 'models'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
 import { ObjectID, Collection } from 'mongodb'
@@ -42,10 +42,10 @@ export class ProjectProvider {
     }
 
 
-    async createProjectShareholdersDistribution(params: CreateProjectShareholdersDistributionParams): Promise<ProjectShareholdersDistribution> {
+    async createProjectShareholdersDistribution(params: CreateProjectTokenholdersDistributionParams): Promise<ProjectTokenholdersDistribution> {
         // TODO: Validation
 
-        let projectShareholders = ProjectShareholdersDistribution.fromParams(params) as any
+        let projectShareholders = ProjectTokenholdersDistribution.fromParams(params) as any
 
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('project-shareholders') as Collection
