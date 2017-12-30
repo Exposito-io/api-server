@@ -43,8 +43,8 @@ router.get('/byWallet/:walletId', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        if (!(await userProvider.validateProjectMembers(req.body.projectId, [req.user.id])))
-            throw "User doesn't belong to project"
+        //if (!(await userProvider.validateProjectMembers(req.body.projectId, [req.user.id])))
+        //    throw "User doesn't belong to project"
 
         let periodicPayment = await paymentProvider.createPeriodicPayment({
             schedule: req.body.schedule,

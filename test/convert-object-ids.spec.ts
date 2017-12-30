@@ -1,3 +1,4 @@
+import * as mocha from 'mocha'
 import * as chai from 'chai'
 import { BitcoinWallet, ObjectId } from 'models'
 import { ObjectID as MongoObjectId } from 'mongodb'

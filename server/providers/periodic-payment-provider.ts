@@ -68,7 +68,10 @@ export class PeriodicPaymentProvider {
 
         // TODO: Validate wallet
 
-        let periodicPayment = new PeriodicPayment(options)
+        let periodicPayment = convertStringsToObjectIds(new PeriodicPayment(options))
+
+        if (typeof periodicPayment.sourceWalletId === 'string')
+            periodicPayment.sourceWalletId = new ObjectID(periodicPayment.sourceWalletId)
 
         let db = await dbFactory.getConnection(config.database)
 
