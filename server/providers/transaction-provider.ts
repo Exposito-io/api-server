@@ -90,7 +90,7 @@ export class TransactiontProvider {
                 destination: walletId,
                 destinationType: PaymentDestination.EXPOSITO_WALLET 
             }]
-        }).toArray()
+        }).sort({ endDate: -1 }).toArray()
 
 
         return txJson.map(Transaction.fromJSON)
@@ -278,10 +278,10 @@ class CreateBitcoinPaymentOptions {
 
 
 function convertBtcToUsd(btcAmount: Money) {
-    return Money.fromStringDecimal(btcAmount.multiply(4526).toString(), 'USD') as Money
+    return Money.fromStringDecimal(btcAmount.multiply(14000).toDecimal().toFixed(2), 'USD') as Money
 }
 
 
 function convertUsdToBtc(usdAmount: Money) {    
-    return Money.fromStringDecimal(usdAmount.toString(), 'BTC').divide(4526) as Money
+    return Money.fromStringDecimal(usdAmount.toString(), 'BTC').divide(14000) as Money
 }

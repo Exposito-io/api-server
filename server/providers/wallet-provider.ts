@@ -34,7 +34,7 @@ class WalletProvider {
         try {
             let clientObjectIds = clientIds.map( clientId => typeof clientId === 'string' ? new ObjectID(clientId) : clientId )
             let db = await dbFactory.getConnection(config.database)
-            let wallets = await db.collection('wallets').find({}).toArray()
+            let wallets = await db.collection('wallets').find({}).sort({ _id: 1 }).toArray()
 
             return wallets.map(wallet => Wallet.fromJSON(convertObjectIdsToStrings(wallet)))
 
