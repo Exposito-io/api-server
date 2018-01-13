@@ -40,7 +40,6 @@ router.post('/', async (req, res) => {
                 roles: []
             }],
             shareholders: req.body.shareholders,
-            hosting: 1,
             githubProjects: []
         })
 
