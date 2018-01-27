@@ -3,6 +3,11 @@
 .DS_Store
 Thumbs.db
 
+config/
+!config/default.sample.ts
+
+.vscode
+
 # Dependencies
 # ======================
 node_modules/

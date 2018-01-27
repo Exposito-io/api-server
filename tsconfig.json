@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2017",
+        "allowSyntheticDefaultImports": true,
         "rootDir": "./",
         "outDir": "./build/",
         "module": "commonjs",
@@ -15,7 +16,7 @@
         "baseUrl": ".",
         "lib": ["es2017"],
         "paths": {
-            "*": ["*"]
+            "*": ["*", "contracts/*"]
         },
         "typeRoots": [
             "types"
