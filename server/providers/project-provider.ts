@@ -3,6 +3,10 @@ import config from '../../config'
 import * as dbFactory from 'mongo-factory'
 import { ObjectID, Collection } from 'mongodb'
 import { convertObjectIdsToStrings, convertStringsToObjectIds } from '../lib/convert-object-ids'
+import { createContract } from '../lib/ethereum-tools'
+import BigNumber from 'bignumber.js'
+
+import expositoProjectCompiled from '../../contracts/compiled/ExpositoProject'
 
 
 export class ProjectProvider {
@@ -19,10 +23,19 @@ export class ProjectProvider {
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('projects') as Collection
 
+        let totalTokens = params.shareholders.reduce((prev, curr) => prev.add(curr.shares), new BigNumber(0))
+
+        let receipt = await createContract({
+            contract: expositoProjectCompiled,
+            constructorParams: [ 0, 0, 0, project.name, 0, '', true ] // totalTokens
+        })
+
         project.members = project.members.map(member => {
             member.userId = new ObjectID(member.userId)
             return member
         })
+
+        project.contractAddress = receipt.contractAddress
 
         let results = await col.insertOne(project)
 
