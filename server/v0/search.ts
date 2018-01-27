@@ -17,7 +17,7 @@ const tokenholderSnapshotProvider = new ProjectTokenholdersSnapshotProvider()
 
 let github = new GitHubApi()
 github.authenticate({
-    token: '',
+    token: config.githubToken,
     type: 'oauth'
 })
 

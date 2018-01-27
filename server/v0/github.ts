@@ -21,7 +21,7 @@ redisCache.store.events.on('redisError', function(error) {
 
 let github = new GitHubApi()
 github.authenticate({
-    token: '',
+    token: config.githubToken,
     type: 'oauth'
 })
 

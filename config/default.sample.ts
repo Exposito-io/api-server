@@ -14,4 +14,5 @@ export class Config {
     corsOrigin = 'http://localhost:3001'
     secretsPath = 'E:\\tmp\\test2\\Exposito\\secrets'
     queueServer = 'redis://127.0.0.1:6379'
+    ethProviderUrl = 'http://localhost:8545'
 }
