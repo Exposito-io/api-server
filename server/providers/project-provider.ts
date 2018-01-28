@@ -1,4 +1,12 @@
-import { Project, CreateProjectParams, ProjectTokenholdersDistribution, CreateProjectTokenholdersDistributionParams, ExpositoError, ErrorCode } from 'models'
+import { 
+    Project, 
+    CreateProjectParams, 
+    ProjectTokenholdersDistribution, 
+    GithubTokenholdersDescription,
+     CreateProjectTokenholdersDistributionParams, 
+     ExpositoError, 
+     ErrorCode 
+} from 'models'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
 import { ObjectID, Collection } from 'mongodb'
@@ -28,7 +36,7 @@ export class ProjectProvider {
 
         let devTokenReceipt = await createContract({
             contract: developerTokenCompiled,
-            constructorParams: [ 0, 0, 0, project.name, 100, true ] 
+            constructorParams: [ 0, 0, 101 ] 
         })
 
         let projectReceipt = await createContract({

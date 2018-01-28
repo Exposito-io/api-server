@@ -9,12 +9,7 @@ import "./TokenController.sol";
  *  @dev      
  */
 contract DeveloperToken is Controlled {
-
-    /** 
-     * Project name 
-     * @deprecated Will be removed in future versions
-     */
-    string public name;                
+        
 
     /** Version of the contract */
     string public version = "0.0.1"; 
@@ -57,97 +52,29 @@ contract DeveloperToken is Controlled {
     /** Tracks the history of the `totalSupply` of the token */
     Checkpoint[] totalSupplyHistory;
 
-    /** Flag that determines if the token is transferable or not. */
-    bool public transfersEnabled;
-
-    /** The factory used to create new clone tokens */
-    DeveloperFactory public tokenFactory;
 
     /** 
-     * @param _tokenFactory The address of the DeveloperTokenFactory contract that
-     *  will create the Clone token contracts, the token factory needs to be deployed first
      * @param _parentToken Address of the parent token, set to 0x0 if it is a
      *  new token
      * @param _parentSnapShotBlock Block of the parent token that will
      *  determine the initial distribution of the clone token, set to 0 if it
      *  is a new token
-     * @param _tokenName Name of the new token
-     * @param _transfersEnabled If true, tokens will be able to be transferred
      */
     function DeveloperToken(
-        address _tokenFactory,
         address _parentToken,
         uint _parentSnapShotBlock,
-        string _tokenName,
-        uint _standardTokenSupply,
-        bool _transfersEnabled
+        uint _supply
     ) public {
-        tokenFactory = DeveloperFactory(_tokenFactory);
-        name = _tokenName;                               
         parentToken = DeveloperToken(_parentToken);
         parentSnapShotBlock = _parentSnapShotBlock;
-        transfersEnabled = _transfersEnabled;
         creationBlock = block.number;
 
-        if (_standardTokenSupply > 0)
-            generateTokens(msg.sender, _standardTokenSupply);
+        if (_supply > 0)
+            generateTokens(msg.sender, _supply);
     }
 
 
-    /// @notice Send `_amount` tokens to `_to` from `msg.sender`
-    /// @param _to The address of the recipient
-    /// @param _amount The amount of tokens to be transferred
-    /// @return Whether the transfer was successful or not
-    function transfer(address _to, uint256 _amount) public returns (bool success) {
-        require(transfersEnabled);
-        doTransfer(msg.sender, _to, _amount);
-        return true;
-    }
-
-    /// @dev This is the actual transfer function in the token contract, it can
-    ///  only be called by other functions in this contract.
-    /// @param _from The address holding the tokens being transferred
-    /// @param _to The address of the recipient
-    /// @param _amount The amount of tokens to be transferred
-    /// @return True if the transfer was successful
-    function doTransfer(address _from, address _to, uint _amount
-    ) internal {
-
-           if (_amount == 0) {
-               Transfer(_from, _to, _amount);    // Follow the spec to louch the event when transfer 0
-               return;
-           }
-
-           require(parentSnapShotBlock < block.number);
-
-           // Do not allow transfer to 0x0 or the token contract itself
-           require((_to != 0) && (_to != address(this)));
-
-           // If the amount being transfered is more than the balance of the
-           //  account the transfer throws
-           var previousBalanceFrom = balanceOfAt(_from, block.number);
-
-           require(previousBalanceFrom >= _amount);
-
-           // Alerts the token controller of the transfer
-           if (isContract(controller)) {
-               require(TokenController(controller).onTransfer(_from, _to, _amount));
-           }
-
-           // First update the balance array with the new value for the address
-           //  sending the tokens
-           updateValueAtNow(balances[_from], previousBalanceFrom - _amount);
-
-           // Then update the balance array with the new value for the address
-           //  receiving the tokens
-           var previousBalanceTo = balanceOfAt(_to, block.number);
-           require(previousBalanceTo + _amount >= previousBalanceTo); // Check for overflow
-           updateValueAtNow(balances[_to], previousBalanceTo + _amount);
-
-           // An event to make the transfer easy to find on the blockchain
-           Transfer(_from, _to, _amount);
-
-    }
+ 
 
     /// @param _owner The address that's balance is being requested
     /// @return The balance of `_owner` at the current block
@@ -216,36 +143,7 @@ contract DeveloperToken is Controlled {
 
 
 
-    /// @notice Creates a new clone token with the initial distribution being
-    ///  this token at `_snapshotBlock`
-    /// @param _cloneTokenName Name of the clone token
-    /// @param _snapshotBlock Block when the distribution of the parent token is
-    ///  copied to set the initial distribution of the new clone token;
-    ///  if the block is zero than the actual block, the current block is used
-    /// @param _transfersEnabled True if transfers are allowed in the clone
-    /// @return The address of the new DeveloperToken Contract
-    function createCloneToken(
-        string _cloneTokenName,
-        uint _snapshotBlock,
-        bool _transfersEnabled
-        ) public returns(address) {
 
-        if (_snapshotBlock == 0) 
-            _snapshotBlock = block.number;
-
-        DeveloperToken cloneToken = tokenFactory.createCloneToken(
-            this,
-            _snapshotBlock,
-            _cloneTokenName,
-            _transfersEnabled
-            );
-
-        cloneToken.changeController(msg.sender);
-
-        // An event to make the token easy to find on the blockchain
-        NewCloneToken(address(cloneToken), _snapshotBlock);
-        return address(cloneToken);
-    }
 
 
     /// @notice Generates `_amount` tokens that are assigned to `_owner`
@@ -260,33 +158,9 @@ contract DeveloperToken is Controlled {
         require(previousBalanceTo + _amount >= previousBalanceTo); // Check for overflow
         updateValueAtNow(totalSupplyHistory, curTotalSupply + _amount);
         updateValueAtNow(balances[_owner], previousBalanceTo + _amount);
-        Transfer(0, _owner, _amount);
         return true;
     }
 
-
-    /// @notice Burns `_amount` tokens from `_owner`
-    /// @param _owner The address that will lose the tokens
-    /// @param _amount The quantity of tokens to burn
-    /// @return True if the tokens are burned correctly
-    function destroyTokens(address _owner, uint _amount
-    ) onlyController public returns (bool) {
-        uint curTotalSupply = totalSupply();
-        require(curTotalSupply >= _amount);
-        uint previousBalanceFrom = balanceOf(_owner);
-        require(previousBalanceFrom >= _amount);
-        updateValueAtNow(totalSupplyHistory, curTotalSupply - _amount);
-        updateValueAtNow(balances[_owner], previousBalanceFrom - _amount);
-        Transfer(_owner, 0, _amount);
-        return true;
-    }
-
-
-    /// @notice Enables token holders to transfer their tokens freely if true
-    /// @param _transfersEnabled True if transfers are allowed in the clone
-    function enableTransfers(bool _transfersEnabled) public onlyController {
-        transfersEnabled = _transfersEnabled;
-    }
 
 
 
@@ -296,7 +170,8 @@ contract DeveloperToken is Controlled {
     /// @return The number of tokens being queried
     function getValueAt(Checkpoint[] storage checkpoints, uint _block
     ) constant internal returns (uint) {
-        if (checkpoints.length == 0) return 0;
+        if (checkpoints.length == 0) 
+            return 0;
 
         // Shortcut for the actual value
         if (_block >= checkpoints[checkpoints.length-1].fromBlock)
@@ -307,7 +182,7 @@ contract DeveloperToken is Controlled {
         uint min = 0;
         uint max = checkpoints.length-1;
         while (max > min) {
-            uint mid = (max + min + 1)/ 2;
+            uint mid = (max + min + 1) / 2;
             if (checkpoints[mid].fromBlock<=_block) {
                 min = mid;
             } else {
@@ -324,7 +199,7 @@ contract DeveloperToken is Controlled {
     function updateValueAtNow(Checkpoint[] storage checkpoints, uint _value
     ) internal  {
         if ((checkpoints.length == 0)
-        || (checkpoints[checkpoints.length -1].fromBlock < block.number)) {
+        || (checkpoints[checkpoints.length - 1].fromBlock < block.number)) {
                Checkpoint storage newCheckPoint = checkpoints[ checkpoints.length++ ];
                newCheckPoint.fromBlock =  uint128(block.number);
                newCheckPoint.value = uint128(_value);
@@ -339,7 +214,8 @@ contract DeveloperToken is Controlled {
     /// @return True if `_addr` is a contract
     function isContract(address _addr) constant internal returns(bool) {
         uint size;
-        if (_addr == 0) return false;
+        if (_addr == 0) 
+            return false;
         assembly {
             size := extcodesize(_addr)
         }
@@ -360,64 +236,6 @@ contract DeveloperToken is Controlled {
     }
 
 
-    /// @notice This method can be used by the controller to extract mistakenly
-    ///  sent tokens to this contract.
-    /// @param _token The address of the token contract that you want to recover
-    ///  set to 0 in case you want to extract ether.
-    function claimTokens(address _token) public onlyController {
-        if (_token == 0x0) {
-            controller.transfer(this.balance);
-            return;
-        }
-
-        DeveloperToken token = DeveloperToken(_token);
-        uint balance = token.balanceOf(this);
-        token.transfer(controller, balance);
-        ClaimedTokens(_token, controller, balance);
-    }
-
-
-    event ClaimedTokens(address indexed _token, address indexed _controller, uint _amount);
-    event Transfer(address indexed _from, address indexed _to, uint256 _amount);
-    event NewCloneToken(address indexed _cloneToken, uint _snapshotBlock);
-    event Approval(
-        address indexed _owner,
-        address indexed _spender,
-        uint256 _amount
-        );
-
 }
 
 
-/// @dev This contract is used to generate clone contracts from a contract.
-///  In solidity this is the way to create a contract from a contract of the
-///  same class
-contract DeveloperFactory {
-
-    /// @notice Update the DApp by creating a new token with new functionalities
-    ///  the msg.sender becomes the controller of this clone token
-    /// @param _parentToken Address of the token being cloned
-    /// @param _snapshotBlock Block of the parent token that will
-    ///  determine the initial distribution of the clone token
-    /// @param _tokenName Name of the new token
-    /// @param _transfersEnabled If true, tokens will be able to be transferred
-    /// @return The address of the new token contract
-    function createCloneToken(
-        address _parentToken,
-        uint _snapshotBlock,
-        string _tokenName,
-        bool _transfersEnabled
-    ) public returns (DeveloperToken) {
-        DeveloperToken newToken = new DeveloperToken(
-            this,
-            _parentToken,
-            _snapshotBlock,
-            _tokenName,
-            0,
-            _transfersEnabled
-            );
-
-        newToken.changeController(msg.sender);
-        return newToken;
-    }
-}
