@@ -5,7 +5,7 @@ Thumbs.db
 
 config/
 !config/default.sample.ts
-
+bin/
 .vscode
 
 # Dependencies
