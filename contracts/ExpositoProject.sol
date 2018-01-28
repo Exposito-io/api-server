@@ -23,9 +23,10 @@ contract ExpositoProject is Controlled {
     string public version = "0.0.1"; 
 
 
-    /// @dev `Checkpoint` is the structure that attaches a block number to a
-    ///  given value, the block number attached is the one that last changed the
-    ///  value
+    /** 
+     *  @dev `Checkpoint` is the structure that attaches a block number to a
+     *  given value, the block number attached is the one that last changed the value
+     */    
     struct Checkpoint {
 
         // `fromBlock` is the block number that the value was generated from
@@ -51,16 +52,16 @@ contract ExpositoProject is Controlled {
     //  occurred is also included in the map
     mapping (address => Checkpoint[]) balances;
 
-    // `allowed` tracks any extra transfer rights as in all ERC20 tokens
+    /** `allowed` tracks any extra transfer rights as in all ERC20 tokens */
     mapping (address => mapping (address => uint256)) allowed;
 
-    // Tracks the history of the `totalSupply` of the token
+    /** Tracks the history of the `totalSupply` of the token */
     Checkpoint[] totalSupplyHistory;
 
-    // Flag that determines if the token is transferable or not.
+    /** Flag that determines if the token is transferable or not. */
     bool public transfersEnabled;
 
-    // The factory used to create new clone tokens
+    /** The factory used to create new clone tokens */
     ExpositoProjectFactory public tokenFactory;
 
     /// @notice Constructor to create an ExpositoProject contract
@@ -79,6 +80,7 @@ contract ExpositoProject is Controlled {
         address _parentToken,
         uint _parentSnapShotBlock,
         string _tokenName,
+        uint _standardTokenSupply,
         bool _transfersEnabled
     ) public {
         tokenFactory = ExpositoProjectFactory(_tokenFactory);
@@ -87,6 +89,9 @@ contract ExpositoProject is Controlled {
         parentSnapShotBlock = _parentSnapShotBlock;
         transfersEnabled = _transfersEnabled;
         creationBlock = block.number;
+
+        if (_standardTokenSupply > 0)
+            generateTokens(msg.sender, _standardTokenSupply);
     }
 
 
@@ -516,6 +521,7 @@ contract ExpositoProjectFactory {
             _parentToken,
             _snapshotBlock,
             _tokenName,
+            0,
             _transfersEnabled
             );
 
