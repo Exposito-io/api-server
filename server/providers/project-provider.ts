@@ -27,7 +27,7 @@ export class ProjectProvider {
 
         let receipt = await createContract({
             contract: expositoProjectCompiled,
-            constructorParams: [ 0, 0, 0, project.name, 0, '', true ] // totalTokens
+            constructorParams: [ 0, 0, 0, project.name, '', true ] // totalTokens
         })
 
         project.members = project.members.map(member => {

@@ -20,7 +20,7 @@ export async function createContract(params: CreateContractParams): Promise<any>
         
             web3 = extendWeb3(web3)
         
-            var Contract = web3.eth.contract(params.contract.abi) 
+            let Contract = web3.eth.contract(params.contract.abi) 
         
             let contractData = Contract.new.getData(...(params.constructorParams), {
                 data: params.contract.bytecode
@@ -41,10 +41,10 @@ export async function createContract(params: CreateContractParams): Promise<any>
                 nonce: web3.toHex(nonce)
             }
             
-            var tx = new Tx(tra) as any
+            let tx = new Tx(tra) as any
             tx.sign(new Buffer(config.ethPrivateKey, 'hex'))
             
-            var stx = tx.serialize()
+            let stx = tx.serialize()
 
             web3.eth.sendRawTransaction('0x' + stx.toString('hex'), (err, hash) => {
                 if (err) { 
