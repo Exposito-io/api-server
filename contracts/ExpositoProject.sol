@@ -19,8 +19,8 @@ contract ExpositoProject is Controlled {
      */
     string public name;                
 
-    string public symbol;              //An identifier: e.g. REP
-    string public version = "0.0.1"; //An arbitrary versioning scheme
+    /** Version of the contract */
+    string public version = "0.0.1"; 
 
 
     /// @dev `Checkpoint` is the structure that attaches a block number to a
@@ -63,10 +63,6 @@ contract ExpositoProject is Controlled {
     // The factory used to create new clone tokens
     ExpositoProjectFactory public tokenFactory;
 
-////////////////
-// Constructor
-////////////////
-
     /// @notice Constructor to create an ExpositoProject contract
     /// @param _tokenFactory The address of the ExpositoProjectFactory contract that
     ///  will create the Clone token contracts, the token factory needs to be
@@ -77,19 +73,16 @@ contract ExpositoProject is Controlled {
     ///  determine the initial distribution of the clone token, set to 0 if it
     ///  is a new token
     /// @param _tokenName Name of the new token
-    /// @param _tokenSymbol Token Symbol for the new token
     /// @param _transfersEnabled If true, tokens will be able to be transferred
     function ExpositoProject(
         address _tokenFactory,
         address _parentToken,
         uint _parentSnapShotBlock,
         string _tokenName,
-        string _tokenSymbol,
         bool _transfersEnabled
     ) public {
         tokenFactory = ExpositoProjectFactory(_tokenFactory);
-        name = _tokenName;                                 // Set the name
-        symbol = _tokenSymbol;                             // Set the symbol
+        name = _tokenName;                               
         parentToken = ExpositoProject(_parentToken);
         parentSnapShotBlock = _parentSnapShotBlock;
         transfersEnabled = _transfersEnabled;
@@ -311,7 +304,6 @@ contract ExpositoProject is Controlled {
     /// @notice Creates a new clone token with the initial distribution being
     ///  this token at `_snapshotBlock`
     /// @param _cloneTokenName Name of the clone token
-    /// @param _cloneTokenSymbol Symbol of the clone token
     /// @param _snapshotBlock Block when the distribution of the parent token is
     ///  copied to set the initial distribution of the new clone token;
     ///  if the block is zero than the actual block, the current block is used
@@ -319,11 +311,10 @@ contract ExpositoProject is Controlled {
     /// @return The address of the new ExpositoProject Contract
     function createCloneToken(
         string _cloneTokenName,
-        string _cloneTokenSymbol,
         uint _snapshotBlock,
         bool _transfersEnabled
         ) public returns(address) {
-            
+
         if (_snapshotBlock == 0) 
             _snapshotBlock = block.number;
 
@@ -331,7 +322,6 @@ contract ExpositoProject is Controlled {
             this,
             _snapshotBlock,
             _cloneTokenName,
-            _cloneTokenSymbol,
             _transfersEnabled
             );
 
@@ -513,14 +503,12 @@ contract ExpositoProjectFactory {
     /// @param _snapshotBlock Block of the parent token that will
     ///  determine the initial distribution of the clone token
     /// @param _tokenName Name of the new token
-    /// @param _tokenSymbol Token Symbol for the new token
     /// @param _transfersEnabled If true, tokens will be able to be transferred
     /// @return The address of the new token contract
     function createCloneToken(
         address _parentToken,
         uint _snapshotBlock,
         string _tokenName,
-        string _tokenSymbol,
         bool _transfersEnabled
     ) public returns (ExpositoProject) {
         ExpositoProject newToken = new ExpositoProject(
@@ -528,7 +516,6 @@ contract ExpositoProjectFactory {
             _parentToken,
             _snapshotBlock,
             _tokenName,
-            _tokenSymbol,
             _transfersEnabled
             );
 
