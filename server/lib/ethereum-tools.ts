@@ -29,7 +29,7 @@ export async function createContract(params: CreateContractParams): Promise<any>
             const gasPrice = web3.eth.gasPrice
             //const gasPriceHex = web3.toHex(4000000000)
             const gasPriceHex = web3.toHex(gasPrice)
-            const gasLimitHex = web3.toHex(4000000)
+            const gasLimitHex = web3.toHex(4400000)
             var nonce = web3.eth.getTransactionCount(config.ethAccountAddress)
             
             var tra = {

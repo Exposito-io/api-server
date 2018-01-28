@@ -7,6 +7,7 @@ import { createContract } from '../lib/ethereum-tools'
 import BigNumber from 'bignumber.js'
 
 import expositoProjectCompiled from '../../contracts/compiled/ExpositoProject'
+import developerTokenCompiled from '../../contracts/compiled/DeveloperToken'
 
 
 export class ProjectProvider {
@@ -25,9 +26,14 @@ export class ProjectProvider {
 
         let totalTokens = params.shareholders.reduce((prev, curr) => prev.add(curr.shares), new BigNumber(0))
 
-        let receipt = await createContract({
+        let devTokenReceipt = await createContract({
+            contract: developerTokenCompiled,
+            constructorParams: [ 0, 0, 0, project.name, 100, true ] 
+        })
+
+        let projectReceipt = await createContract({
             contract: expositoProjectCompiled,
-            constructorParams: [ 0, 0, 0, project.name, totalTokens, true ] // totalTokens
+            constructorParams: [ 0, 0, 0, project.name, totalTokens, devTokenReceipt.contractAddress, true ] 
         })
 
         project.members = project.members.map(member => {
@@ -35,7 +41,7 @@ export class ProjectProvider {
             return member
         })
 
-        project.contractAddress = receipt.contractAddress
+        project.contractAddress = projectReceipt.contractAddress
 
         let results = await col.insertOne(project)
 

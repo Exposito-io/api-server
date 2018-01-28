@@ -2,18 +2,13 @@ pragma solidity ^0.4.18;
 
 import "./Controlled.sol";
 import "./TokenController.sol";
-import "./DeveloperToken.sol";
 
-contract ApproveAndCallFallBack {
-    function receiveApproval(address from, uint256 _amount, address _token, bytes _data) public;   
-}
 
 /** 
- *  @title ExpositoProject Contract
- *  @dev Main contract that represents an Exposito Project token distribution.  
- *  The contract is based on the MiniMe Token     
+ *  @title DeveloperToken Contract
+ *  @dev      
  */
-contract ExpositoProject is Controlled {
+contract DeveloperToken is Controlled {
 
     /** 
      * Project name 
@@ -23,8 +18,6 @@ contract ExpositoProject is Controlled {
 
     /** Version of the contract */
     string public version = "0.0.1"; 
-
-    DeveloperToken public developerSupply;
 
 
     /** 
@@ -44,7 +37,7 @@ contract ExpositoProject is Controlled {
      * `parentToken` is the Token address that was cloned to produce this token it will be 0x0 for 
      * a token that was not cloned
      */
-    ExpositoProject public parentToken;
+    DeveloperToken public parentToken;
 
     /** 
      *  `parentSnapShotBlock` is the block number from the Parent Token that was used to determine 
@@ -61,9 +54,6 @@ contract ExpositoProject is Controlled {
      */
     mapping (address => Checkpoint[]) balances;
 
-    /** `allowed` tracks any extra transfer rights as in all ERC20 tokens */
-    mapping (address => mapping (address => uint256)) allowed;
-
     /** Tracks the history of the `totalSupply` of the token */
     Checkpoint[] totalSupplyHistory;
 
@@ -71,10 +61,10 @@ contract ExpositoProject is Controlled {
     bool public transfersEnabled;
 
     /** The factory used to create new clone tokens */
-    ExpositoProjectFactory public tokenFactory;
+    DeveloperFactory public tokenFactory;
 
     /** 
-     * @param _tokenFactory The address of the ExpositoProjectFactory contract that
+     * @param _tokenFactory The address of the DeveloperTokenFactory contract that
      *  will create the Clone token contracts, the token factory needs to be deployed first
      * @param _parentToken Address of the parent token, set to 0x0 if it is a
      *  new token
@@ -84,72 +74,42 @@ contract ExpositoProject is Controlled {
      * @param _tokenName Name of the new token
      * @param _transfersEnabled If true, tokens will be able to be transferred
      */
-    function ExpositoProject(
+    function DeveloperToken(
         address _tokenFactory,
         address _parentToken,
         uint _parentSnapShotBlock,
         string _tokenName,
         uint _standardTokenSupply,
-        address _developerToken,
         bool _transfersEnabled
     ) public {
-        tokenFactory = ExpositoProjectFactory(_tokenFactory);
+        tokenFactory = DeveloperFactory(_tokenFactory);
         name = _tokenName;                               
-        parentToken = ExpositoProject(_parentToken);
+        parentToken = DeveloperToken(_parentToken);
         parentSnapShotBlock = _parentSnapShotBlock;
         transfersEnabled = _transfersEnabled;
         creationBlock = block.number;
-        developerSupply = DeveloperToken(_developerToken);
 
         if (_standardTokenSupply > 0)
             generateTokens(msg.sender, _standardTokenSupply);
     }
 
 
-    /** @notice Send `_amount` tokens to `_to` from `msg.sender`
-     *  @param _to The address of the recipient
-     *  @param _amount The amount of tokens to be transferred
-     *  @return Whether the transfer was successful or not
-     */
+    /// @notice Send `_amount` tokens to `_to` from `msg.sender`
+    /// @param _to The address of the recipient
+    /// @param _amount The amount of tokens to be transferred
+    /// @return Whether the transfer was successful or not
     function transfer(address _to, uint256 _amount) public returns (bool success) {
         require(transfersEnabled);
         doTransfer(msg.sender, _to, _amount);
         return true;
     }
 
-    /** 
-     *  @notice Send `_amount` tokens to `_to` from `_from` on the condition it is approved by `_from`
-     *  @param _from The address holding the tokens being transferred
-     *  @param _to The address of the recipient
-     *  @param _amount The amount of tokens to be transferred
-     *  @return True if the transfer was successful
-     */
-    function transferFrom(address _from, address _to, uint256 _amount
-    ) public returns (bool success) {
-
-        // The controller of this contract can move tokens around at will,
-        //  this is important to recognize! Confirm that you trust the
-        //  controller of this contract, which in most situations should be
-        //  another open source smart contract or 0x0
-        if (msg.sender != controller) {
-            require(transfersEnabled);
-
-            // The standard ERC 20 transferFrom functionality
-            require(allowed[_from][msg.sender] >= _amount);
-            allowed[_from][msg.sender] -= _amount;
-        }
-        doTransfer(_from, _to, _amount);
-        return true;
-    }
-
-    /** 
-     * @dev This is the actual transfer function in the token contract, it can
-     *  only be called by other functions in this contract.
-     * @param _from The address holding the tokens being transferred
-     * @param _to The address of the recipient
-     * @param _amount The amount of tokens to be transferred
-     * @return True if the transfer was successful
-     */
+    /// @dev This is the actual transfer function in the token contract, it can
+    ///  only be called by other functions in this contract.
+    /// @param _from The address holding the tokens being transferred
+    /// @param _to The address of the recipient
+    /// @param _amount The amount of tokens to be transferred
+    /// @return True if the transfer was successful
     function doTransfer(address _from, address _to, uint _amount
     ) internal {
 
@@ -189,87 +149,24 @@ contract ExpositoProject is Controlled {
 
     }
 
-    /**
-     *  @param _owner The address that's balance is being requested
-     *  @return The balance of `_owner` at the current block
-     */
+    /// @param _owner The address that's balance is being requested
+    /// @return The balance of `_owner` at the current block
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balanceOfAt(_owner, block.number);
     }
 
-    /** 
-     *  @notice `msg.sender` approves `_spender` to spend `_amount` tokens on
-     *  its behalf. This is a modified version of the ERC20 approve function
-     *  to be a little bit safer
-     *  @param _spender The address of the account able to transfer the tokens
-     *  @param _amount The amount of tokens to be approved for transfer
-     *  s@return True if the approval was successful
-     */
-    function approve(address _spender, uint256 _amount) public returns (bool success) {
-        require(transfersEnabled);
-
-        // To change the approve amount you first have to reduce the addresses`
-        //  allowance to zero by calling `approve(_spender,0)` if it is not
-        //  already 0 to mitigate the race condition described here:
-        //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-        require((_amount == 0) || (allowed[msg.sender][_spender] == 0));
-
-        // Alerts the token controller of the approve function call
-        if (isContract(controller)) {
-            require(TokenController(controller).onApprove(msg.sender, _spender, _amount));
-        }
-
-        allowed[msg.sender][_spender] = _amount;
-        Approval(msg.sender, _spender, _amount);
-        return true;
-    }
-
-    /**
-     *  @dev This function makes it easy to read the `allowed[]` map
-     *  @param _owner The address of the account that owns the token
-     *  @param _spender The address of the account able to transfer the tokens
-     *  @return Amount of remaining tokens of _owner that _spender is allowed to spend
-     */
-    function allowance(address _owner, address _spender
-    ) public constant returns (uint256 remaining) {
-        return allowed[_owner][_spender];
-    }
-
-    /**  
-     *   @notice `msg.sender` approves `_spender` to send `_amount` tokens on
-     *    its behalf, and then a function is triggered in the contract that is
-     *    being approved, `_spender`. This allows users to use their tokens to
-     *    interact with contracts in one function call instead of two
-     *   @param _spender The address of the contract able to transfer the tokens
-     *   @param _amount The amount of tokens to be approved for transfer
-     *   @return True if the function call was successful
-     */
-    function approveAndCall(address _spender, uint256 _amount, bytes _extraData
-    ) public returns (bool success) {
-        require(approve(_spender, _amount));
-
-        ApproveAndCallFallBack(_spender).receiveApproval(
-            msg.sender,
-            _amount,
-            this,
-            _extraData
-        );
-
-        return true;
-    }
 
     /** Returns the total number of tokens */
     function totalSupply() public constant returns (uint) {
-        return totalSupplyAt(block.number) + developerSupply.totalSupply();
+        return totalSupplyAt(block.number);
     }
 
 
-    /** 
-     * @dev Queries the balance of `_owner` at a specific `_blockNumber`
-     * @param _owner The address from which the balance will be retrieved
-     * @param _blockNumber The block number when the balance is queried
-     * @return The balance at `_blockNumber`
-     */
+
+    /// @dev Queries the balance of `_owner` at a specific `_blockNumber`
+    /// @param _owner The address from which the balance will be retrieved
+    /// @param _blockNumber The block number when the balance is queried
+    /// @return The balance at `_blockNumber`
     function balanceOfAt(address _owner, uint _blockNumber) public constant
         returns (uint) {
 
@@ -293,11 +190,9 @@ contract ExpositoProject is Controlled {
         }
     }
 
-    /**
-     *  @notice Total amount of tokens at a specific `_blockNumber`.
-     * @param _blockNumber The block number when the totalSupply is queried
-     * @return The total amount of tokens at `_blockNumber`
-     */
+    /// @notice Total amount of tokens at a specific `_blockNumber`.
+    /// @param _blockNumber The block number when the totalSupply is queried
+    /// @return The total amount of tokens at `_blockNumber`
     function totalSupplyAt(uint _blockNumber) public constant returns(uint) {
 
         // These next few lines are used when the totalSupply of the token is
@@ -320,16 +215,15 @@ contract ExpositoProject is Controlled {
     }
 
 
-    /**
-     *  @notice Creates a new clone token with the initial distribution being
-     *   this token at `_snapshotBlock`
-     *  @param _cloneTokenName Name of the clone token
-     *  @param _snapshotBlock Block when the distribution of the parent token is
-     *   copied to set the initial distribution of the new clone token;
-     *   if the block is zero than the actual block, the current block is used
-     *  @param _transfersEnabled True if transfers are allowed in the clone
-     *  @return The address of the new ExpositoProject Contract
-     */
+
+    /// @notice Creates a new clone token with the initial distribution being
+    ///  this token at `_snapshotBlock`
+    /// @param _cloneTokenName Name of the clone token
+    /// @param _snapshotBlock Block when the distribution of the parent token is
+    ///  copied to set the initial distribution of the new clone token;
+    ///  if the block is zero than the actual block, the current block is used
+    /// @param _transfersEnabled True if transfers are allowed in the clone
+    /// @return The address of the new DeveloperToken Contract
     function createCloneToken(
         string _cloneTokenName,
         uint _snapshotBlock,
@@ -339,7 +233,7 @@ contract ExpositoProject is Controlled {
         if (_snapshotBlock == 0) 
             _snapshotBlock = block.number;
 
-        ExpositoProject cloneToken = tokenFactory.createCloneToken(
+        DeveloperToken cloneToken = tokenFactory.createCloneToken(
             this,
             _snapshotBlock,
             _cloneTokenName,
@@ -354,12 +248,10 @@ contract ExpositoProject is Controlled {
     }
 
 
-    /** 
-     *  @notice Generates `_amount` tokens that are assigned to `_owner`
-     *  @param _owner The address that will be assigned the new tokens
-     *  @param _amount The quantity of tokens generated
-     *  @return True if the tokens are generated correctly
-     */
+    /// @notice Generates `_amount` tokens that are assigned to `_owner`
+    /// @param _owner The address that will be assigned the new tokens
+    /// @param _amount The quantity of tokens generated
+    /// @return True if the tokens are generated correctly
     function generateTokens(address _owner, uint _amount
     ) public onlyController returns (bool) {
         uint curTotalSupply = totalSupply();
@@ -373,12 +265,10 @@ contract ExpositoProject is Controlled {
     }
 
 
-    /**
-     *  @notice Burns `_amount` tokens from `_owner`
-     *  @param _owner The address that will lose the tokens
-     *  @param _amount The quantity of tokens to burn
-     *  @return True if the tokens are burned correctly
-     */
+    /// @notice Burns `_amount` tokens from `_owner`
+    /// @param _owner The address that will lose the tokens
+    /// @param _amount The quantity of tokens to burn
+    /// @return True if the tokens are burned correctly
     function destroyTokens(address _owner, uint _amount
     ) onlyController public returns (bool) {
         uint curTotalSupply = totalSupply();
@@ -392,40 +282,32 @@ contract ExpositoProject is Controlled {
     }
 
 
-
-    /**
-     *  @notice Enables token holders to transfer their tokens freely if true
-     *  @param _transfersEnabled True if transfers are allowed in the clone
-     */
+    /// @notice Enables token holders to transfer their tokens freely if true
+    /// @param _transfersEnabled True if transfers are allowed in the clone
     function enableTransfers(bool _transfersEnabled) public onlyController {
         transfersEnabled = _transfersEnabled;
     }
 
 
-    /**
-     *  @dev `getValueAt` retrieves the number of tokens at a given block number
-     *  @param checkpoints The history of values being queried
-     *  @param _block The block number to retrieve the value at
-     *  @return The number of tokens being queried
-     */
+
+    /// @dev `getValueAt` retrieves the number of tokens at a given block number
+    /// @param checkpoints The history of values being queried
+    /// @param _block The block number to retrieve the value at
+    /// @return The number of tokens being queried
     function getValueAt(Checkpoint[] storage checkpoints, uint _block
     ) constant internal returns (uint) {
-
-        if (checkpoints.length == 0) 
-            return 0;
+        if (checkpoints.length == 0) return 0;
 
         // Shortcut for the actual value
         if (_block >= checkpoints[checkpoints.length-1].fromBlock)
             return checkpoints[checkpoints.length-1].value;
-
-        if (_block < checkpoints[0].fromBlock) 
-            return 0;
+        if (_block < checkpoints[0].fromBlock) return 0;
 
         // Binary search of the value in the array
         uint min = 0;
         uint max = checkpoints.length-1;
         while (max > min) {
-            uint mid = (max + min + 1) / 2;
+            uint mid = (max + min + 1)/ 2;
             if (checkpoints[mid].fromBlock<=_block) {
                 min = mid;
             } else {
@@ -435,16 +317,14 @@ contract ExpositoProject is Controlled {
         return checkpoints[min].value;
     }
 
-    /**  
-     *   @dev `updateValueAtNow` used to update the `balances` map and the
-     *    `totalSupplyHistory`
-     *   @param checkpoints The history of data being updated
-     *   @param _value The new number of tokens
-     */
+    /// @dev `updateValueAtNow` used to update the `balances` map and the
+    ///  `totalSupplyHistory`
+    /// @param checkpoints The history of data being updated
+    /// @param _value The new number of tokens
     function updateValueAtNow(Checkpoint[] storage checkpoints, uint _value
     ) internal  {
         if ((checkpoints.length == 0)
-        || (checkpoints[checkpoints.length - 1].fromBlock < block.number)) {
+        || (checkpoints[checkpoints.length -1].fromBlock < block.number)) {
                Checkpoint storage newCheckPoint = checkpoints[ checkpoints.length++ ];
                newCheckPoint.fromBlock =  uint128(block.number);
                newCheckPoint.value = uint128(_value);
@@ -454,51 +334,43 @@ contract ExpositoProject is Controlled {
            }
     }
 
-    /**
-     *  @dev Internal function to determine if an address is a contract
-     *  @param _addr The address being queried
-     *  @return True if `_addr` is a contract
-     */
+    /// @dev Internal function to determine if an address is a contract
+    /// @param _addr The address being queried
+    /// @return True if `_addr` is a contract
     function isContract(address _addr) constant internal returns(bool) {
         uint size;
-        if (_addr == 0) 
-            return false;
-
+        if (_addr == 0) return false;
         assembly {
             size := extcodesize(_addr)
         }
         return size>0;
     }
 
-    /** @dev Helper function to return a min betwen the two uints */
+    /// @dev Helper function to return a min betwen the two uints
     function min(uint a, uint b) pure internal returns (uint) {
         return a < b ? a : b;
     }
 
-    /**  
-     * @notice The fallback function: If the contract's controller has not been
-     *  set to 0, then the `proxyPayment` method is called which relays the
-     *  ether and creates tokens as described in the token controller contract
-     */
+    /// @notice The fallback function: If the contract's controller has not been
+    ///  set to 0, then the `proxyPayment` method is called which relays the
+    ///  ether and creates tokens as described in the token controller contract
     function () public payable {
         require(isContract(controller));
         require(TokenController(controller).proxyPayment.value(msg.value)(msg.sender));
     }
 
 
-    /**
-     *  @notice This method can be used by the controller to extract mistakenly
-     *  sent tokens to this contract.
-     *  @param _token The address of the token contract that you want to recover
-     *  set to 0 in case you want to extract ether.
-     */
+    /// @notice This method can be used by the controller to extract mistakenly
+    ///  sent tokens to this contract.
+    /// @param _token The address of the token contract that you want to recover
+    ///  set to 0 in case you want to extract ether.
     function claimTokens(address _token) public onlyController {
         if (_token == 0x0) {
             controller.transfer(this.balance);
             return;
         }
 
-        ExpositoProject token = ExpositoProject(_token);
+        DeveloperToken token = DeveloperToken(_token);
         uint balance = token.balanceOf(this);
         token.transfer(controller, balance);
         ClaimedTokens(_token, controller, balance);
@@ -517,36 +389,30 @@ contract ExpositoProject is Controlled {
 }
 
 
+/// @dev This contract is used to generate clone contracts from a contract.
+///  In solidity this is the way to create a contract from a contract of the
+///  same class
+contract DeveloperFactory {
 
-/**
- *  @dev This contract is used to generate clone contracts from a contract.
- *  In solidity this is the way to create a contract from a contract of the
- *  same class
- */
-contract ExpositoProjectFactory {
-
-    /**
-     *  @notice Update the DApp by creating a new token with new functionalities
-     *  the msg.sender becomes the controller of this clone token
-     * @param _parentToken Address of the token being cloned
-     * @param _snapshotBlock Block of the parent token that will
-     *  determine the initial distribution of the clone token
-     * @param _tokenName Name of the new token
-     * @param _transfersEnabled If true, tokens will be able to be transferred
-     * @return The address of the new token contract
-     */ 
+    /// @notice Update the DApp by creating a new token with new functionalities
+    ///  the msg.sender becomes the controller of this clone token
+    /// @param _parentToken Address of the token being cloned
+    /// @param _snapshotBlock Block of the parent token that will
+    ///  determine the initial distribution of the clone token
+    /// @param _tokenName Name of the new token
+    /// @param _transfersEnabled If true, tokens will be able to be transferred
+    /// @return The address of the new token contract
     function createCloneToken(
         address _parentToken,
         uint _snapshotBlock,
         string _tokenName,
         bool _transfersEnabled
-    ) public returns (ExpositoProject) {
-        ExpositoProject newToken = new ExpositoProject(
+    ) public returns (DeveloperToken) {
+        DeveloperToken newToken = new DeveloperToken(
             this,
             _parentToken,
             _snapshotBlock,
             _tokenName,
-            0,
             0,
             _transfersEnabled
             );
