@@ -3,9 +3,9 @@ import {
     CreateProjectParams, 
     ProjectTokenholdersDistribution, 
     GithubTokenholdersDescription,
-     CreateProjectTokenholdersDistributionParams, 
-     ExpositoError, 
-     ErrorCode 
+    CreateProjectTokenholdersDistributionParams, 
+    ExpositoError, 
+    ErrorCode 
 } from 'models'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
@@ -20,7 +20,6 @@ import developerTokenCompiled from '../../contracts/compiled/DeveloperToken'
 
 export class ProjectProvider {
 
-
     constructor() {
 
     }
@@ -32,16 +31,22 @@ export class ProjectProvider {
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('projects') as Collection
 
-        let totalTokens = params.shareholders.reduce((prev, curr) => prev.add(curr.shares), new BigNumber(0))
+        let developerTokens = params.shareholders
+          .filter(tokenholder => GithubTokenholdersDescription.runtimeType().is(tokenholder))
+          .reduce((prev, curr) => prev.add(curr.shares), new BigNumber(0))
+
+        let standardTokens = params.shareholders
+          .filter(tokenholder => !GithubTokenholdersDescription.runtimeType().is(tokenholder))
+          .reduce((prev, curr) => prev.add(curr.shares), new BigNumber(0))
 
         let devTokenReceipt = await createContract({
             contract: developerTokenCompiled,
-            constructorParams: [ 0, 0, 101 ] 
+            constructorParams: [ developerTokens, [], [], 18 ] 
         })
 
         let projectReceipt = await createContract({
             contract: expositoProjectCompiled,
-            constructorParams: [ 0, 0, 0, project.name, totalTokens, devTokenReceipt.contractAddress, true ] 
+            constructorParams: [ 0, 0, 0, project._id, standardTokens, devTokenReceipt.contractAddress, true ] 
         })
 
         project.members = project.members.map(member => {
