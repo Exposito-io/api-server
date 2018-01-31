@@ -11,29 +11,31 @@ contract ApproveAndCallFallBack {
 }
 
 /** 
- *  @title ExpositoProject Contract
- *  @dev Main contract that represents an Exposito Project token distribution.  
- *  The contract is based on the MiniMe Token 
+ *  Main contract based on MiniMeToken that represents an Exposito Project token distribution.  
+ *  It contains standard ERC20 tokens, and "coding shares", which is the number of tokens allocated
+ *  to developers for their code contributions, proportionnal to the number of lines of code each
+ *  of them has written. Since code changes with time, the developer tokens are not transferable,
+ *  but can be used for everything else like voting, management or to receive a dividend.
  */
 contract ExpositoProject is Controlled, EIP20Interface {
        
 
-    /** Version of the contract */
+    /** Contract version */
     string public version = "0.0.1"; 
 
     /** Project ID */
     string public projectId;
 
-    /** Developer tokens contract */
+    /** Developer token contract for coding shares */
     DeveloperToken public developerToken;
 
-    /**   */
+    /** Developer token history */
     DeveloperToken[] public developerTokenHistory;
 
 
     /** 
-     *  @dev `Checkpoint` is the structure that attaches a block number to a
-     *  given value, the block number attached is the one that last changed the value
+     * `Checkpoint` is the structure that attaches a block number to a
+     * given value, the block number attached is the one that last changed the value
      */    
     struct Checkpoint {
 
@@ -79,10 +81,13 @@ contract ExpositoProject is Controlled, EIP20Interface {
 
     /** 
      * @param _tokenFactory The address of the ExpositoProjectFactory contract that
-     *  will create the Clone token contracts, the token factory needs to be deployed first
+     * will create the Clone token contracts, the token factory needs to be deployed first
      * @param _parentToken Address of the parent token, set to 0x0 if it is a new token
      * @param _parentSnapShotBlock Block of the parent token that will determine the
      * initial distribution of the clone token, set to 0 if it is a new token
+     * @param _projectId Exposito Project id
+     * @param _standardTokenSupply Amount of standard ERC20 tokens
+     * @param _developerToken DeveloperToken contract address
      * @param _transfersEnabled If true, tokens will be able to be transferred
      */
     function ExpositoProject(
@@ -107,11 +112,15 @@ contract ExpositoProject is Controlled, EIP20Interface {
     }
 
 
+    /** Set a new id for the project */
     function setProjectId(string _projectId) public onlyController {
         projectId = _projectId;
     }
 
-
+    /** 
+     * Code changes with time. Therefore, the DeveloperToken is regenerated periodically
+     * to fit the code contributions.
+     */
     function setDeveloperToken(address _developerToken) public onlyController {
         developerTokenHistory.push(developerToken);
         developerToken = DeveloperToken(_developerToken);
@@ -155,7 +164,7 @@ contract ExpositoProject is Controlled, EIP20Interface {
     }
 
     /** 
-     * @dev This is the actual transfer function in the token contract, it can
+     * This is the actual transfer function in the token contract, it can
      *  only be called by other functions in this contract.
      * @param _from The address holding the tokens being transferred
      * @param _to The address of the recipient
@@ -231,7 +240,7 @@ contract ExpositoProject is Controlled, EIP20Interface {
      *  to be a little bit safer
      *  @param _spender The address of the account able to transfer the tokens
      *  @param _amount The amount of tokens to be approved for transfer
-     *  s@return True if the approval was successful
+     *  @return True if the approval was successful
      */
     function approve(address _spender, uint256 _amount) public returns (bool success) {
         require(transfersEnabled);

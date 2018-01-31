@@ -3,12 +3,15 @@ pragma solidity ^0.4.18;
 
 
 /** 
- *  @title DeveloperToken Contract
- *  @dev    
+ *  Represents the coding shares associated to an ExpositoProject.
+ *  Coding shares are distributed proportionally to each developer who contributed to the
+ *  project. Since those contributions change over time, the tokens are redistributed
+ *  periodically. Thus, they give all the rights of a standard token except they cannot be 
+ *  transfered by their owner.    
  */
 contract DeveloperToken {        
 
-    /** Version of the contract */
+    /** Contract version */
     string public version = "0.0.1"; 
 
     /** Timestamp of the contract creation */
@@ -17,7 +20,7 @@ contract DeveloperToken {
     /** Total number of tokens */
     uint256 public totalSupply;
 
-    /**  */
+    /** Balances of each address */
     mapping (address => uint256) public balances;
 
     /** How many decimals to show */
@@ -25,6 +28,12 @@ contract DeveloperToken {
 
     uint256 constant private MAX_UINT256 = 2**256 - 1;
 
+    /**
+     * @param _supplyAmount Amount of tokens 
+     * @param _balanceAddresses Addresses of owners
+     * @param _balanceAmounts Amount of tokens associated with each owner
+     * @param _decimalUnits How many decimals to show
+     */
     function DeveloperToken(
         uint256 _supplyAmount,
         address[] _balanceAddresses,

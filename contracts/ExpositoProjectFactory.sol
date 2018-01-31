@@ -3,7 +3,8 @@ pragma solidity ^0.4.18;
 import "./ExpositoProject.sol";
 
 /**
- *  @dev This contract is used to generate clone contracts from a contract.
+ *  This contract is used to generate clone contracts from a contract.
+ *  It is based on the MiniMeTokenFactory contract.
  *  In solidity this is the way to create a contract from a contract of the
  *  same class
  */
