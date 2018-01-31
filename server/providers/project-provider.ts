@@ -22,11 +22,6 @@ import developerTokenCompiled from '../../contracts/compiled/DeveloperToken'
  */
 export class ProjectProvider {
 
-    constructor() {
-
-    }
-
-
     /**
      * Creates an Exposito Project, with a corresponding Ethereum smart contract.
      * @param params.name Project name
