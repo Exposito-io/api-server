@@ -17,7 +17,9 @@ import BigNumber from 'bignumber.js'
 import expositoProjectCompiled from '../../contracts/compiled/ExpositoProject'
 import developerTokenCompiled from '../../contracts/compiled/DeveloperToken'
 
-
+/**
+ * Exposito Projects provider
+ */
 export class ProjectProvider {
 
     constructor() {
@@ -25,6 +27,12 @@ export class ProjectProvider {
     }
 
 
+    /**
+     * Creates an Exposito Project, with a corresponding Ethereum smart contract.
+     * @param params.name Project name
+     * @param params.description Project description
+     * @param params.shareholders Token distribution 
+     */
     async createProject(params: CreateProjectParams): Promise<Project> {
         let project = Project.fromParams(params) as any
 
