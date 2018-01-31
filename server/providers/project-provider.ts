@@ -102,7 +102,11 @@ export class ProjectProvider {
     }
 
 
-
+    /**
+     * Returns a project by its id
+     * 
+     * @param projectId {string} Project Id
+     */
     async getProjectById(projectId: string): Promise<Project> {
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('projects') as Collection
@@ -112,6 +116,11 @@ export class ProjectProvider {
         return Project.fromJSON(project)
     }
 
+    /**
+     * Returns the projects associated with a user
+     * 
+     * @param userId {string} User Id
+     */
     async getUserProjects(userId: string): Promise<Project[]> {
         let db = await dbFactory.getConnection(config.database)
         let col = db.collection('projects') as Collection
