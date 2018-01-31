@@ -48,15 +48,14 @@ export class UserProvider {
     /**
      * Returns a user from his id
      *
-     * @param  {string|ObjectId} id User ID
+     * @param  {string} id User Id
      * @return {Promise}
      */
-    async findById(id: string|ObjectID) {
-        if (!(id instanceof ObjectID))
-            id = new ObjectID(id);
+    async findById(id: string) {
+        let objectId = new ObjectID(id);
 
         let db = await dbFactory.getConnection(config.database)
-        let users = await db.collection('users').find({ _id: id }).limit(1).toArray()
+        let users = await db.collection('users').find({ _id: objectId }).limit(1).toArray()
 
         if (users.length === 0)
             throw("No user found")
