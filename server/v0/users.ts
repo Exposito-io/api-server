@@ -43,6 +43,24 @@ router.get('/:id', async (req, res) => {
     }
 })
 
+router.get('/:id/selectedProject', async (req, res) => {
+    try {
+        if (!checkAccess(req.user.id, req.params.id))
+            throw('Wrong access')
+
+        let user = await provider.findById(req.user.id)
+        res.json(user)
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
+
+
+function checkAccess(userId: string, requestedUserId: string) {
+    return userId === requestedUserId
+}
+
 
 
 

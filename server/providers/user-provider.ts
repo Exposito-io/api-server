@@ -3,7 +3,7 @@
 import { ObjectID, Collection } from 'mongodb'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
-import { User } from 'models'
+import { User, Project } from 'models'
 import { OrganizationProvider } from './organization-provider'
 import { ProjectProvider } from './project-provider'
 
@@ -55,12 +55,12 @@ export class UserProvider {
         let objectId = new ObjectID(id);
 
         let db = await dbFactory.getConnection(config.database)
-        let users = await db.collection('users').find({ _id: objectId }).limit(1).toArray()
-
-        if (users.length === 0)
-            throw("No user found")
-        else
-            return users[0]
+        let user = await db.collection('users').findOne({ _id: objectId })
+        
+        if (user)
+            return User.fromJSON(user)
+        else        
+            return null
 
     }
 
@@ -115,8 +115,7 @@ export class UserProvider {
     }
 
     /**
-     * Promise returns true if specified users are 
-     * members of a project
+     * Promise returns true if specified users are members of a project
      * 
      * @param projectnId 
      * @param userIds 
@@ -128,6 +127,33 @@ export class UserProvider {
             return userIds.every(userId => org.members.some(member => member.userId === userId))
         else
             return null
+    }    
+
+
+    /**
+     * Returns the currently selected project for a specific user
+     * 
+     * @param {string} userId 
+     */
+    async getSelectedProject(userId: string): Promise<Project> {
+        let user = await this.findById(userId)
+
+        if (user.userPreferences && user.userPreferences.selectedProjectId)
+            return await projectProvider.getProjectById(user.userPreferences.selectedProjectId)
+        else {
+            let projects = await projectProvider.getUserProjects(userId)
+            return projects[0]
+        } 
+    }
+
+
+    /**
+     * Returns the projects associated with a specific user
+     * 
+     * @param {string} userId User Id
+     */
+    async getProjects(userId: string) {
+        return projectProvider.getUserProjects(userId)
     }    
 
 
