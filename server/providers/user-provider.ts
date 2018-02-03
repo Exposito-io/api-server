@@ -3,7 +3,7 @@
 import { ObjectID, Collection } from 'mongodb'
 import config from '../../config'
 import * as dbFactory from 'mongo-factory'
-import { User, Project } from 'models'
+import { User, Project, UserPreferences } from 'models'
 import { OrganizationProvider } from './organization-provider'
 import { ProjectProvider } from './project-provider'
 
@@ -88,13 +88,13 @@ export class UserProvider {
     /**
      * General search method
      * 
-     * @param str 
+     * @param {string} query
      */
-    async find(str: string): Promise<User[]> {
+    async find(query: string): Promise<User[]> {
         
         let db = await dbFactory.getConnection(config.database)
 
-        let userData = await db.collection('users').find({ name: new RegExp(str, "i") }).toArray()
+        let userData = await db.collection('users').find({ name: new RegExp(query, "i") }).toArray()
 
         return userData.map(user => User.fromJSON(user))
         
@@ -131,9 +131,31 @@ export class UserProvider {
 
 
     /**
+     * Returns the user preferences, including the selectedProject informations
+     * 
+     * @param {string} userId User id
+     */
+    async getPreferences(userId: string): Promise<UserPreferences> {
+        let user = await this.findById(userId)
+
+        if (user.userPreferences && user.userPreferences.selectedProjectId)
+            user.userPreferences.selectedProject = await projectProvider.getProjectById(user.userPreferences.selectedProjectId)
+        else {
+            if (!user.userPreferences)
+                user.userPreferences = {} as any
+                
+            let projects = await projectProvider.getUserProjects(userId)
+            user.userPreferences.selectedProject = projects[0]
+        } 
+
+        return user.userPreferences
+    }  
+
+
+    /**
      * Returns the currently selected project for a specific user
      * 
-     * @param {string} userId 
+     * @param {string} userId User id
      */
     async getSelectedProject(userId: string): Promise<Project> {
         let user = await this.findById(userId)

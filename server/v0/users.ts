@@ -15,7 +15,24 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
     try {
-        res.json({  })
+        let user = await provider.findById(req.user.id)
+        res.json(user)
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
+router.get('/selectedProject', async (req, res) => {
+    try {
+        res.json(await provider.getSelectedProject(req.user.id))
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
+router.get('/preferences', async (req, res) => {
+    try {
+        res.json(await provider.getPreferences(req.user.id))
     } catch(e) {
         res.json({ error: e})
     }
@@ -48,8 +65,18 @@ router.get('/:id/selectedProject', async (req, res) => {
         if (!checkAccess(req.user.id, req.params.id))
             throw('Wrong access')
 
-        let user = await provider.findById(req.user.id)
-        res.json(user)
+        res.json(await provider.getSelectedProject(req.params.id))
+    } catch(e) {
+        res.json({ error: e})
+    }
+})
+
+router.get('/:id/preferences', async (req, res) => {
+    try {
+        if (!checkAccess(req.user.id, req.params.id))
+            throw('Wrong access')
+
+        res.json(await provider.getPreferences(req.params.id))
     } catch(e) {
         res.json({ error: e})
     }
